@@ -1,0 +1,32 @@
+page-top
+  div.wrap-page#wrapCanvas
+    module-canvas
+
+
+  style(scoped, type='less').
+    :scope {
+      .wrap-page {
+        display: block;
+        width: 100%;
+        height: 100%;
+        background: #fff;
+        overflow: scroll;
+        #wrapCanvas {
+          position: relative;
+          overflow: scroll;
+
+        }        
+      }
+    }
+
+  script.
+
+    var self = this;
+
+
+    this.on('mount', function(){
+
+      //canvas.parent('canvas');
+      //initCanvas();
+    });
+    

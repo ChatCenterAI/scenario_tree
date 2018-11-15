@@ -1,0 +1,44 @@
+module-canvas#canvas
+  svg#canvasSvg
+    line#lineForPreview
+  item-pop-after-drag
+  //item-selection
+
+
+  style(scoped, type='less').
+    :scope {
+      position: relative;
+      display: block;
+      overflow: scroll;
+      width: 1000%;
+      height: 1000%;
+      #canvasSvg {
+        pointer-events: none;
+        position: relative;
+        width: 1000%;
+        height: 1000%;
+        left: 0;
+        top: 0;
+        z-index: 11;
+        line {
+          position: relative;
+          z-index: 11;
+          pointer-events: auto;
+        }
+        #lineForPreview {
+          display: none;
+        }
+        .show {
+          display: block !important;
+        }
+      }
+    }
+
+  script.
+
+    this.on('mount', function(){
+
+      initCanvas();
+
+    });
+    

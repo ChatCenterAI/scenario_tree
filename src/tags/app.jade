@@ -1,0 +1,104 @@
+app
+  //div.header
+    a(href="#") Top
+    br
+    a(href="#about") About
+    br
+    a(href="#test/test") Modal Test Link
+  //header
+    util-header
+  div.wrap-content
+    content
+    modal-content
+    up-modal-content
+
+  style(scoped, type='less').
+    :scope {
+      display: block;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      .wrap-content {
+        position: relative;
+        display: block;
+        width: 100%;
+        height: 100%;
+        /*height: ~"calc(100% - 48px)";*/
+        /*top: 0;*/
+        /*top: 48px;*/
+        overflow: hidden;
+        content {
+          display: block;
+          position: absolute;
+          z-index: 1;
+          width: 100%;
+          height: 100%;
+          overflow-y: scroll;
+          -webkit-overflow-scrolling: touch;
+          overflow-scrolling: touch;
+          top: 0;
+          left: 0;
+          background: #fff;
+
+          transition: all 0.4s;
+          opacity: 0.0;
+        }
+        .not-opacity {
+          opacity: 1.0;
+        }
+        modal-content {
+          display: block;
+          position: absolute;
+          z-index: 5;
+          width: 100%;
+          height: 100%;
+          overflow-y: scroll;
+          -webkit-overflow-scrolling: touch;
+          overflow-scrolling: touch;
+          top: 0;
+          background: #fff;
+          /*padding: 48px 0;*/
+          /*margin-top: 48px;*/
+
+          transition: all 0.4s;
+          opacity: 0.0;
+          left: 100%;
+        }
+        up-modal-content {
+          display: block;
+          position: absolute;
+          z-index: 4;
+          width: 100%;
+          height: 100%;
+          overflow-y: scroll;
+          -webkit-overflow-scrolling: touch;
+          overflow-scrolling: touch;
+          left: 0;
+          background: #fff;
+          /*padding: 48px 0;*/
+          /*margin-top: 48px;*/
+
+          transition: all 0.4s;
+          opacity: 0.0;
+          top: 100%;
+        }
+        .show {
+          opacity: 1.0;
+          top: 0%;
+          left: 0%;
+        }
+      }
+    }
+
+
+  script.
+
+    var self = this;
+
+    this.contents = {
+      test: {
+        title: 'title',
+        body: 'body',
+        label: 'link label',
+      },
+    };

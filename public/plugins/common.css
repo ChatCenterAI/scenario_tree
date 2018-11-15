@@ -1,0 +1,122 @@
+/*@import url('https://fonts.googleapis.com/earlyaccess/notosansjapanese.css');*/
+
+
+h1 {
+  font-family: "Yu Gothic", Noto Sans Japanese, Noto Sans JP , helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
+}
+
+h2 {
+  font-family: "Yu Gothic", Noto Sans Japanese, Noto Sans JP , helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
+}
+
+h3 {
+  font-family: "Yu Gothic", Noto Sans Japanese, Noto Sans JP , helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
+}
+
+p {
+  font-family: "Yu Gothic", Noto Sans Japanese, Noto Sans JP , helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
+  font-size: 16px;
+}
+
+span {
+  font-family: "Yu Gothic", Noto Sans Japanese, Noto Sans JP , helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
+}
+
+li {
+  font-family: "Yu Gothic", Noto Sans Japanese, Noto Sans JP , helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
+}
+
+a {
+  font-family: "Yu Gothic", Noto Sans Japanese, Noto Sans JP , helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
+}
+
+
+/*
+html {
+  overflow-y: hidden;
+}
+
+h1 {
+  font-family: "Iowan Old Style", 游明朝, YuMincho, "Hiragino Mincho ProN", Meiryo, serif;
+}
+
+h2 {
+  font-family: "Iowan Old Style", 游明朝, YuMincho, "Hiragino Mincho ProN", Meiryo, serif;
+  font-size: 20px;
+  color: #2a2a2a;
+}
+
+h3 {
+  font-family: "Iowan Old Style", 游明朝, YuMincho, "Hiragino Mincho ProN", Meiryo, serif;
+}
+
+p {
+  font-family: "Iowan Old Style", 游明朝, YuMincho, "Hiragino Mincho ProN", Meiryo, serif;
+  font-size: 16px;
+}
+
+span {
+  font-family: "Iowan Old Style", 游明朝, YuMincho, "Hiragino Mincho ProN", Meiryo, serif;
+}
+
+li {
+  font-family: "Iowan Old Style", 游明朝, YuMincho, "Hiragino Mincho ProN", Meiryo, serif;
+}
+
+a {
+  font-family: "Iowan Old Style", 游明朝, YuMincho, "Hiragino Mincho ProN", Meiryo, serif;
+}
+*/
+
+.en {
+  display: block;
+}
+
+.jp {
+  display: none;
+}
+
+.no-top-marker {
+  background-size: 201% !important;
+  background-position: 0% 0% !important;
+}
+
+.no-marker {
+  background-size: 201% !important;
+  background-position: 0% 0% !important;
+}
+
+.no-background {
+  background: rgba(255,255,255,0) !important;
+}
+
+.add-opacity {
+  opacity: 0.0;
+
+  transition-property: all;
+  transition-duration: 400ms;
+  transition-delay: 0s;
+  transition-timing-function: ease;
+}
+
+.not-opacity {
+  opacity: 1 !important;
+}
+
+.not-scroll {
+  overflow: hidden;
+  /*
+  height: 100%;
+  width: 100%;
+  position: fixed;
+  */
+}
+
+@media only screen and (max-width : 600px) {
+  p {
+    font-family: "Iowan Old Style", 游明朝, YuMincho, "Hiragino Mincho ProN", Meiryo, serif;
+    font-size: 14px;
+  }
+}
+
+

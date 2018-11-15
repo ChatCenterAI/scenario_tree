@@ -1,0 +1,84 @@
+item-pop-after-drag
+  div.wrap-item
+    p(onclick='{addSimpleMessage}').px12.pt8.pb7 Simple Message
+    p(onclick='{addQuestion}').px12.pt8.pb7 Ask a Question
+
+  style(scoped, type='less').
+    :scope {
+      display: none;
+      position: absolute;
+      left: 100px;
+      top: 100px;
+      background: #1976d2;
+      border-radius: 3px;
+      overflow: hidden;
+      filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));
+      &.show-pop {
+        display: block !important;
+      }
+      .wrap-item {
+        p {
+          cursor: pointer;
+          color: #fff;
+          text-align: center;
+          font-weight: 300;
+          letter-spacing: 0.6px;
+        }
+        p:first-child{
+          border-bottom: solid rgba(255,255,255,0.5) 0.5px;
+        }
+      }
+    }
+
+  script.
+
+    var self = this;
+
+    this.addSimpleMessage = function(){
+      var idRand = Math.floor(Math.random()*10000);
+      var content = {
+        id: 'simple-tmp' + idRand,
+        type: 'normal',
+        text: 'This is My Second Message: '+idRand,
+        gui: {
+          bottomLine: topLineToSaveToNextEvent,
+        },
+      };
+
+      addSimpleMessage(arrowTo.x, arrowTo.y, content, false);
+
+      // ポップを消去
+      var pop = document.querySelector('item-pop-after-drag');
+      pop.classList.remove('show-pop');
+
+    }
+
+    this.addQuestion = function(){
+      var idRand = Math.floor(Math.random()*10000);
+      var content = {
+        id: 'selection-tmp' + idRand,
+        type: 'selection',
+        text: 'How are you?: '+idRand,
+        selections: [
+          {label: 'I am so fine', id: 'selection' + Math.floor(Math.random()*10000)},
+          {label:'Not good', id: 'selection' + Math.floor(Math.random()*10000)},
+          {label:'I am too sleepy', id: 'selection' + Math.floor(Math.random()*10000)},
+          {label:'Others', id: 'selection' + Math.floor(Math.random()*10000)}
+        ],
+        gui: {
+          bottomLine: topLineToSaveToNextEvent,
+        },
+      };
+
+      addSelections(arrowTo.x, arrowTo.y, content, false);
+
+      // ポップを消去
+      var pop = document.querySelector('item-pop-after-drag');
+      pop.classList.remove('show-pop');
+
+    }
+
+
+
+
+

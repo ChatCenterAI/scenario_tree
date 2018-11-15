@@ -1,0 +1,39 @@
+
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><link type="image/x-icon" rel="shortcut icon" href="./images/favicon.png"><title>Refine</title><meta name="description" content="Refine | Photo Session"><meta name="keywords" content="Photo Session,撮影会,Refine,Refine 撮影"><meta property="og:title" content="Refine"><meta property="og:type" content="website"><meta property="og:description" content="Refine | Photo Session"><meta property="og:url" content=""><meta property="og:image" content="./images/favicon.png"><meta property="og:site_name" content="Refine"><meta property="og:email" content=""><meta name="twitter:card" content="summary"><meta name="twitter:site" content="@as_kou"><meta name="twitter:creator" content="@as_kou"><link rel="stylesheet" href="./plugins/meltline.css"><link rel="stylesheet" href="./plugins/common.css"><script src="https://cdnjs.cloudflare.com/ajax/libs/riot/2.3.18/riot+compiler.js"></script><script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.js"></script><!--script(src='https://cdn.rawgit.com/phi-jp/firerest/f0bf0e7de8fcbc9ef7107115ff2b64f3f9738b7b/firerest.js')--></head><body><app></app><script src="./scripts/tags.js"></script><script>riot.route('/test/*', function(tagName) {
+  riot.mount('modal-content', 'page-test', {content: 'content'});
+  riot.update();
+})
+
+riot.route('/about', function(tagName) {
+
+  if(riot.enableFadeIn) $('content').removeClass('not-opacity');
+
+  riot.enableFadeIn = true;
+
+  $(document).trigger("custom:close");
+
+  setTimeout(function() {
+    $('content').addClass('not-opacity');
+    riot.mount('content', 'page-about', {content: 'content'});
+    riot.update();
+  }, 400);
+})
+
+riot.route(function(tagName) {
+  
+  if(riot.enableFadeIn) $('content').removeClass('not-opacity');
+
+  riot.enableFadeIn = true;
+
+  $(document).trigger("custom:close");
+
+  setTimeout(function() {
+    $('content').addClass('not-opacity');
+    riot.mount('content', 'page-top', {content: 'content'});
+    riot.update();
+  }, 400);
+});
+
+riot.route.start(true);
+
+var tags = riot.mount('app');</script></body></html>

@@ -1,0 +1,68 @@
+item-message(onmouseover='{over}' onmouseout='{out}' data-id='{id}').message
+  div.wrap-item.f.fm.flex-between
+    p.px12.pt8.pb7 {text}
+    div(onmousedown='{down}').wrap-drag-button.pr8.f.fm
+      div.drag-button
+
+  style(scoped, type='less').
+    :scope {
+      position: absolute;
+      display: inline-block;
+      border: solid #1976d2 0.5px;
+      border-radius: 3px;
+      background: #fff;
+      filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));
+      cursor: grab;
+
+      transition: transform 0.2s;
+      transform: scale(1);
+      &.drag {
+        cursor: grabbing !important;
+      }
+      &.active-over {
+        transform: scale(1.05) !important;
+      }
+      .wrap-item {
+        overflow: visible;
+        p {
+          display: inline-block;
+          color: #1976d2;
+          letter-spacing: 0.6px;
+          font-weight: 300;
+        }
+        .wrap-drag-button {
+          cursor: pointer;
+          height: 34px;
+          .drag-button {
+            background: #1976d2;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+          }
+        }
+      }
+    }
+
+  script.
+
+    var self = this;
+    this.id = this.opts.content.id;
+    this.text = this.opts.content.text;
+
+
+    this.down = mdownOnNode;
+
+
+    this.over = moverTemplate;
+    this.out = moutTemplate;
+    
+
+    this.on('mount', function(){
+      //self.drag = dragArrow;
+      /*
+      self.drag = function(e){
+        e.stopPropagation();
+        console.log(e);
+      }
+      */
+    });

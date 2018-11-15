@@ -1,0 +1,93 @@
+item-selection(onmouseover='{over}' onmouseout='{out}' data-id='{id}').message
+  div.wrap-item.px8.py8
+    p.question-text.mb8 {questionText}
+    div.wrap-selections
+      div(each='{item in selections}').wrap-text.f.fm.flex-between.mb8
+        p.pl12.pr8 {item.label}
+        div(onmousedown='{down}').wrap-drag-button.pr8.f.fm
+          div(data-selectionid='{item.id}').drag-button
+
+  style(scoped, type='less').
+    :scope {
+      position: absolute;
+      display: inline-block;
+      border-radius: 3px;
+      background: #1976d2;
+      filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));
+      top: 0;
+      left: 0;
+      cursor: grab;
+
+      transition: transform 0.2s;
+      transform: scale(1);
+      &.drag {
+        cursor: grabbing !important;
+      }
+      &.active-over {
+        transform: scale(1.05) !important;
+      }
+      .question-text {
+        color: #fff;
+        text-align: center;
+        font-weight: 300;
+        letter-spacing: 0.6px;
+      }
+
+      .wrap-item {
+        overflow: visible;
+        .wrap-selections {
+          display: inline-block;
+          border-radius: 3px;
+          .wrap-text {
+            filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));
+            background: #fff;
+            border-radius: 3px;
+            p {
+              width: 100%;
+              color: #1976d2;
+              letter-spacing: 0.6px;
+              font-weight: 300;
+              text-align: center;
+            }
+            .wrap-drag-button {
+              cursor: pointer;
+              height: 34px;
+              .drag-button {
+                background: #1976d2;
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+              }
+            }
+          }
+        }
+      } /* .wrap-item */
+
+    }
+
+  script.
+
+    var self = this;
+
+    this.id = this.opts.content.id; //"selection";
+    this.questionText = this.opts.content.text; //'How are you?';
+    this.selections = this.opts.content.selections;
+
+    /*
+    this.selections = [
+      {label: 'I am so fine', id: 'selection' + Math.floor(Math.random()*10000)},
+      {label:'Not good', id: 'selection' + Math.floor(Math.random()*10000)},
+      {label:'I am too sleepy', id: 'selection' + Math.floor(Math.random()*10000)},
+      {label:'Other', id: 'selection' + Math.floor(Math.random()*10000)}
+    ];
+    */
+
+    this.down = mdownOnNode;
+
+
+    this.over = moverTemplate;
+    this.out = moutTemplate;
+
+
+
+

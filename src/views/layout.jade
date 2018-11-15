@@ -1,0 +1,47 @@
+doctype html
+
+html
+  head
+    meta(charset='utf-8')
+
+    //- for smart phone
+    meta(name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1")
+    meta(name="apple-mobile-web-app-capable" content="yes")
+    meta(name="apple-mobile-web-app-status-bar-style" content="black-translucent")
+    link(type="image/x-icon", rel="shortcut icon", href="./images/favicon.png")
+
+    title Story Tree
+    meta(name="description", content="Story Tree")
+    meta(name="keywords", content="Story Tree")
+
+    //- for facebook
+    meta(property='og:title', content='Story Tree')
+    meta(property='og:type', content='website')
+    meta(property='og:description', content='Story Tree')
+    meta(property='og:url', content='')
+    meta(property='og:image', content='./images/favicon.png')
+    meta(property='og:site_name', content='Story Tree')
+    meta(property='og:email', content='')
+
+    meta(name="twitter:card", content="summary")
+    meta(name="twitter:site", content="@as_kou")
+    meta(name="twitter:creator", content="@as_kou")
+
+    //- meltline.css
+    link(rel='stylesheet', href='./plugins/meltline.css')
+    link(rel='stylesheet', href='./plugins/common.css')
+
+
+    //- riot.js
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/riot/2.3.18/riot+compiler.js')
+
+    //script(type="text/javascript" src='https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/p5.min.js')
+
+    script(type="text/javascript" src='./js/sketch.js')
+
+    //- jquery
+    script(type="text/javascript" src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js')
+    script(type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.js')
+
+  body
+    block content
