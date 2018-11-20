@@ -4,7 +4,6 @@ module-canvas#canvas
   item-pop-after-drag
   //item-selection
 
-
   style(scoped, type='less').
     :scope {
       position: relative;
@@ -36,9 +35,39 @@ module-canvas#canvas
 
   script.
 
-    this.on('mount', function(){
+    var self = this;
 
-      initCanvas();
+    this.on('mount', function(){
 
     });
     
+    this.loadScenario = async ()=>{
+
+      self.project = await service.db.collection("projects")
+        .doc(opts.id)
+        .get()
+        .then(function(data) {
+          return data.data();
+        })
+        .catch(function(error) {
+          console.error("Error writing document: ", error);
+        });
+
+      var firstEventName = `first-${self.project.title}`;
+      scenarioJson = self.project.scenario;
+      initCanvas(firstEventName);
+    }
+
+    $('#loading').fadeIn(400);
+    riot.loadScenarioTimer = setInterval(function(){
+      if(session.user){
+        clearInterval(riot.loadScenarioTimer);
+        self.loadScenario();
+      }
+    }, 800);
+
+    
+    service.db.collection("projects").doc(opts.id)
+      .onSnapshot(function(doc) {
+          console.log("Current data: ", doc.data());
+      });

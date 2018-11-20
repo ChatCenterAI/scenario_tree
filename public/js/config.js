@@ -1,10 +1,15 @@
 var config = {
-  apiKey: "AIzaSyChtcCn7StadcGrq7MOREeS4gDCoWlqLE8",
-  authDomain: "truffle2-proto.firebaseapp.com",
-  databaseURL: "https://truffle2-proto.firebaseio.com",
-  projectId: "truffle2-proto",
-  storageBucket: "truffle2-proto.appspot.com",
-  messagingSenderId: "675686693236",
+  apiKey: "AIzaSyB8jmIBe5Cx-XpOjG30y-bro4sUYJyvmf4",
+  authDomain: "scenario-tree.firebaseapp.com",
+  databaseURL: "https://scenario-tree.firebaseio.com",
+  projectId: "scenario-tree",
+  storageBucket: "scenario-tree.appspot.com",
+  messagingSenderId: "762202280051",
 };
 
+firebase.initializeApp(config);
+
 var session = {};
+var service = {};
+
+service.db = firebase.firestore();

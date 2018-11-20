@@ -1,0 +1,29 @@
+page-canvas
+  div.wrap-page#wrapCanvas
+    module-canvas(id='{scenarioId}')
+
+
+  style(scoped, type='less').
+    :scope {
+      .wrap-page {
+        display: block;
+        width: 100%;
+        height: 100%;
+        background: #fff;
+        overflow: scroll;
+        #wrapCanvas {
+          position: relative;
+          overflow: scroll;
+
+        }        
+      }
+    }
+
+  script.
+
+    var self = this;
+    this.scenarioId = opts.__proto__.id;
+
+    this.on('mount', function(){
+
+    });

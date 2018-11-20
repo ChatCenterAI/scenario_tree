@@ -1,0 +1,49 @@
+util-modal
+  div.wrap-util.f.fh
+    modal-window-content
+    div(onclick='{closeModal}').wrap-overlay.f.fh
+
+  style(scoped, type='less').
+    :scope {
+      display: none;
+      position: fixed;
+      z-index: 101;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      background: rgba(0,0,0,0.4);
+
+      .wrap-util {
+        height: 100%;
+        modal-window-content {
+          z-index: 103;
+          position: relative;
+          border-radius: 3px;
+          transform: scale(0.0);
+          transition: all 0.4s;
+          &.show {
+            transform: scale(1.0) !important;
+          }
+        }
+        .wrap-overlay {
+          z-index: 102;
+          display: block;
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          background: rgba(0,0,0,0.4);
+          cursor: pointer;
+        }
+      }
+    }
+
+  script.
+
+    var self = this;
+
+    this.closeModal = function(){
+      $('util-modal').fadeOut(400);
+      $('modal-window-content').removeClass('show');
+      $(document).trigger("custom:closeModal");
+    }
+    

@@ -1,0 +1,91 @@
+module-modal-create-project
+  div.wrap-module.px14.py16
+    p.title.mb12 Create a New Project
+    div.f
+      textarea(placeholder="Project Name")#projectTitleInput.pt3.pb4.px4.mr6
+      p(onclick='{createProject}').wrap-button.px10.py8 Create
+
+  style(scoped, type='less').
+    :scope {
+      display: block;
+      background: #FFF;
+      .wrap-module {
+        .title {
+          font-size: 16px;
+          font-weight: 400;
+        }
+        textarea {
+          border: solid rgba(0,0,0,0.4) 0.5px;
+          border-radius: 3px;
+          width: 100%;
+          height: 28px;
+          outline: none;
+          resize: none;
+          letter-spacing: 0.6px;
+        }
+        .wrap-button {
+          cursor: pointer;
+          text-align: center;
+          background: #1976d2;
+          color: #fff;
+          letter-spacing: 0.6px;
+          font-size: 12px;
+          font-weight: 400;
+          border-radius: 3px;
+        }
+      }
+    }
+
+  script.
+
+    var self = this;
+
+    this.on('mount', function(){
+      $('modal-window-content').addClass('show');
+
+      $(document).on("custom:closeModal", function() {
+        $('module-modal-create-project').removeClass('show');
+        self.unmount(true);
+      });
+    });
+
+
+    this.createProject = function() {
+      // タイトルがなければreturn
+      var input = document.querySelector('#projectTitleInput');
+      var projectTitle = input.value;
+      if(input.value == '') return;
+
+      // プロジェクトを作成
+      var projectObj = {
+        author: session.user.uid,
+        title: projectTitle,
+        createdAt: new Date(),
+        editedAt: new Date(),
+        scenario: [
+          {
+            id: `first-${projectTitle}`, // TO DO: firstのidが他のと被らないようにする
+            type: 'normal',
+            text: 'Hello',
+            gui: {},
+          },
+        ]
+      };
+
+      service.db.collection("projects")
+        .add(projectObj)
+        .then(function(data) {
+          var id = data.id
+          window.location.href = `./#projects/${id}`;
+          console.log("Document successfully written!");
+        })
+        .catch(function(error) {
+          console.error("Error writing document: ", error);
+        });
+
+      // modalを閉じてunmountする
+      session.isNewProject = true;
+      $('util-modal').fadeOut(400);
+      $('modal-window-content').removeClass('show');
+      $(document).trigger("custom:closeModal");
+    }

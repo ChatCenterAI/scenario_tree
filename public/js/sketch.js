@@ -1,18 +1,10 @@
 
-var scenarioJson = [
-  {
-    id: 'first',
-    type: 'normal',
-    text: 'This is My Message',
-    gui: {},
-  },
-];
 
 var canvas, canvasSvg, canvasWrapper;
 
-var initCanvas = function(){
+var initCanvas = function(firstEventName){
 
-  canvas = document.querySelector('#canvas');
+  canvas = document.querySelector('module-canvas');
   canvasWrapper = document.querySelector('#wrapCanvas');
   canvasSvg = document.querySelector('#canvasSvg');
   
@@ -21,7 +13,7 @@ var initCanvas = function(){
 
   var event;
   for(var i=0; i<scenarioJson.length; i++){
-    if('first'==scenarioJson[i].id){
+    if(firstEventName==scenarioJson[i].id){
       event = scenarioJson[i];
       break;
     }

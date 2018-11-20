@@ -1,0 +1,44 @@
+module-project(onclick='{toCanvas}')
+  div.wrap-module.f.fh
+    div
+      p.title.mb8 {title}
+      p.time {editedAt}
+
+  style(scoped, type='less').
+    :scope {
+      cursor: pointer;
+      width: 31%;
+      height: 200px;
+      filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));
+      border-radius: 3px;
+      background: #FFF;
+      .wrap-module {
+        height: 100%;
+        p {
+          text-align: center;
+        }
+        .title {
+          color: #2a2a2a;
+        }
+        .time {
+          color: #999;
+          font-size: 12px;
+        }
+      }
+    }
+
+  script.
+
+    var self = this;
+
+    this.on('mount', function(){
+
+    });
+
+    this.title = opts.content.title;
+    this.editedAt = moment(opts.content.editedAt).format('ddd DD, YYYY, HH:mm');
+
+    this.toCanvas = function() {
+      session.isNewProject = false;
+      window.location.href = `./#projects/${opts.content.id}`;
+    }
