@@ -23,6 +23,7 @@ item-pop-after-drag
           text-align: center;
           font-weight: 300;
           letter-spacing: 0.6px;
+          white-space: nowrap;
         }
         p:first-child{
           border-bottom: solid rgba(255,255,255,0.5) 0.5px;
@@ -35,17 +36,35 @@ item-pop-after-drag
     var self = this;
 
     this.addSimpleMessage = function(){
-      var idRand = Math.floor(Math.random()*10000);
+
+      // 前のイベントのtopLineの座標を保存
+      //targetEvent.gui.topLinePosition = {origin: arrowOrigin, to: arrowTo};
+      console.log('中', scenarioJson);
+      var event = getEventFromScenarioById(targetEvent.id);
+      event.gui.topLinePosition = {origin: arrowOrigin, to: arrowTo};
+      console.log('後', scenarioJson);
+
+      //debugger
+      //var preEvent = getEventFromScenarioByNext(targetEvent.id);
+      //preEvent.gui.topLinePosition = {origin: arrowOrigin, to: arrowTo};
+
+      // contentを作成
       var content = {
-        id: 'simple-tmp' + idRand,
+        id: 'simple-tmp' + scenarioJson.length,
+        num: scenarioJson.length,
         type: 'normal',
-        text: 'This is My Second Message: '+idRand,
+        text: 'This is My Message: '+scenarioJson.length,
         gui: {
-          bottomLine: topLineToSaveToNextEvent,
+          position: {},
         },
       };
 
       addSimpleMessage(arrowTo.x, arrowTo.y, content, false);
+
+
+      // scenarioをupdateする
+      service.db.collection('projects').doc(opts.id)
+        .update({'scenario': scenarioJson});
 
       // ポップを消去
       var pop = document.querySelector('item-pop-after-drag');
@@ -57,6 +76,7 @@ item-pop-after-drag
       var idRand = Math.floor(Math.random()*10000);
       var content = {
         id: 'selection-tmp' + idRand,
+        num: scenarioJson.length,
         type: 'selection',
         text: 'How are you?: '+idRand,
         selections: [
@@ -66,7 +86,7 @@ item-pop-after-drag
           {label:'Others', id: 'selection' + Math.floor(Math.random()*10000)}
         ],
         gui: {
-          bottomLine: topLineToSaveToNextEvent,
+          position: {},
         },
       };
 
@@ -75,6 +95,9 @@ item-pop-after-drag
       // ポップを消去
       var pop = document.querySelector('item-pop-after-drag');
       pop.classList.remove('show-pop');
+
+      service.db.collection('projects').doc(opts.id)
+        .update({'scenario': scenarioJson});
 
     }
 

@@ -1,7 +1,7 @@
 module-canvas#canvas
   svg#canvasSvg
     line#lineForPreview
-  item-pop-after-drag
+  item-pop-after-drag(id='{opts.id}')
   //item-selection
 
   style(scoped, type='less').
@@ -9,16 +9,17 @@ module-canvas#canvas
       position: relative;
       display: block;
       overflow: scroll;
-      width: 1000%;
-      height: 1000%;
+      width: 100%;
+      height: 100%;
       #canvasSvg {
         pointer-events: none;
         position: relative;
-        width: 1000%;
-        height: 1000%;
+        width: 100000px;
+        height: 100000px;
         left: 0;
         top: 0;
         z-index: 11;
+        max-width: initial;
         line {
           position: relative;
           z-index: 11;
@@ -38,24 +39,31 @@ module-canvas#canvas
     var self = this;
 
     this.on('mount', function(){
-
+      
     });
     
+    riot.currentProjectId = opts.id;
+
     this.loadScenario = async ()=>{
 
       self.project = await service.db.collection("projects")
         .doc(opts.id)
         .get()
-        .then(function(data) {
-          return data.data();
+        .then(function(doc) {
+          var data = doc.data()
+          data.id = doc.id;
+          return data;
         })
         .catch(function(error) {
           console.error("Error writing document: ", error);
         });
 
-      var firstEventName = `first-${self.project.title}`;
+      var firstEventName = `first-${self.project.id}`;
+
       scenarioJson = self.project.scenario;
       initCanvas(firstEventName);
+
+      $('#loading').fadeOut(400);
     }
 
     $('#loading').fadeIn(400);
@@ -66,8 +74,11 @@ module-canvas#canvas
       }
     }, 800);
 
-    
+
     service.db.collection("projects").doc(opts.id)
       .onSnapshot(function(doc) {
-          console.log("Current data: ", doc.data());
+          //console.log("Current data: ", doc.data());
       });
+
+
+

@@ -1,7 +1,7 @@
 page-top
   div.wrap-page.py40
     p.label.mb20 Recent Projects
-    div.wrap-projects.f.flex-between
+    div.wrap-projects.f.flex-between.flex-wrap
       div(onclick='{addProject}').wrap-add-project.f.fh
         div
           img(src='./img/icon/add.svg')
@@ -28,7 +28,7 @@ page-top
         .wrap-projects {
           .wrap-add-project {
             cursor: pointer;
-            width: 31%;
+            width: 32%;
             height: 200px;
             filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));
             border-radius: 3px;

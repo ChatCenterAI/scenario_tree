@@ -1,4 +1,4 @@
-item-message(onmouseover='{over}' onmouseout='{out}' data-id='{id}').message
+item-message(onmouseover='{over}' onmouseout='{out}' id='{id}' data-id='{id}').message
   div.wrap-item.f.fm.flex-between
     p.px12.pt8.pb7 {text}
     div(onmousedown='{down}').wrap-drag-button.pr8.f.fm
@@ -25,6 +25,7 @@ item-message(onmouseover='{over}' onmouseout='{out}' data-id='{id}').message
       .wrap-item {
         overflow: visible;
         p {
+          white-space: nowrap;
           display: inline-block;
           color: #1976d2;
           letter-spacing: 0.6px;

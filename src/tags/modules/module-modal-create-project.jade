@@ -49,39 +49,46 @@ module-modal-create-project
       });
     });
 
-
-    this.createProject = function() {
+    this.createProject = async ()=>{
       // タイトルがなければreturn
       var input = document.querySelector('#projectTitleInput');
       var projectTitle = input.value;
       if(input.value == '') return;
 
-      // プロジェクトを作成
+      // プロジェクトを作成      
       var projectObj = {
         author: session.user.uid,
         title: projectTitle,
         createdAt: new Date(),
         editedAt: new Date(),
-        scenario: [
-          {
-            id: `first-${projectTitle}`, // TO DO: firstのidが他のと被らないようにする
-            type: 'normal',
-            text: 'Hello',
-            gui: {},
-          },
-        ]
       };
 
-      service.db.collection("projects")
+      var id = await service.db.collection("projects")
         .add(projectObj)
         .then(function(data) {
           var id = data.id
-          window.location.href = `./#projects/${id}`;
-          console.log("Document successfully written!");
+          return id;
         })
         .catch(function(error) {
           console.error("Error writing document: ", error);
         });
+
+      // はじめのイベントを追加してシナリオの初期化
+      await service.db.collection("projects").doc(id)
+        .update({'scenario': [
+            {
+              id: `first-${id}`,
+              type: 'normal',
+              text: 'Hello',
+              num: 0,
+              gui: {
+                position: {x: 150, y: 100000/2}
+              }
+            },
+          ]
+        });
+
+      window.location.href = `./#projects/${id}`;
 
       // modalを閉じてunmountする
       session.isNewProject = true;
