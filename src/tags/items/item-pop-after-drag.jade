@@ -40,6 +40,12 @@ item-pop-after-drag
       // 前のイベントのtopLineの座標を保存
       //targetEvent.gui.topLinePosition = {origin: arrowOrigin, to: arrowTo};
 
+      // もし始点にすでにlineがあったらguiから削除する
+      if(targetEvent.gui.topLineId){
+        targetEvent.gui.topLineId
+      }
+
+
       var from = {x: arrowOrigin.x, y: arrowOrigin.y};
       var to = {x: arrowTo.x, y: arrowTo.y};
 
@@ -86,6 +92,8 @@ item-pop-after-drag
         .then(function(){
           $('#wrapSaving').fadeOut(400);
         });
+
+
 
       // ポップを消去
       var pop = document.querySelector('item-pop-after-drag');

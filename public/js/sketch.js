@@ -292,50 +292,26 @@ var mmoveOnNode = function(e) {
     }
   }
 
-  // 前のテンプレートからつながってるlineの終点を修正
-  var bottomLines = [];
-  var bottomLineEvents = [];
-  for(var i=0; i<scenarioJson.length; i++){
-
-    if(scenarioJson[i].type=='normal'){
-      
-      if(scenarioJson[i].next==targetId){
-        var bLine = document.querySelector(`#${scenarioJson[i].gui.topLineId}`);
-        bottomLines.push(bLine);
-        bottomLineEvents.push(scenarioJson[i]);
-      }
-
-    }else if(scenarioJson[i].type=='selection'){
-
-      for(var selection_i=0; selection_i<scenarioJson[i].selections.length; selection_i++){
-        if(scenarioJson[i].selections[selection_i].next==targetId){
-          var bLineId = scenarioJson[i].selections[selection_i].topLineId;
-          var bLine = document.querySelector(`#${bLineId}`);
-          bottomLines.push(bLine);
-          bottomLineEvents.push(scenarioJson[i]);
-        }
-      } // for
-
-    }
-  } // for
-  
-  for(var i=0; i<bottomLines.length; i++){
-    var type = bottomLineEvents[i].type;
-    if(type=='normal'){
-      bottomLineEvents[i].gui.topLinePosition.to.x += gapX;
-      bottomLineEvents[i].gui.topLinePosition.to.y += gapY;
-      bottomLines[i].setAttribute("x2", parseInt(bottomLines[i].getAttribute("x2")) + gapX);
-      bottomLines[i].setAttribute("y2", parseInt(bottomLines[i].getAttribute("y2")) + gapY);
-    }else if(type=='selection'){
-      // TO Do いまここを通そうとしてるよ
-      var preSelectionNode = getSelectionFromScenarioByNext(targetId);
-      preSelectionNode.topLinePosition.to.x += gapX;
-      preSelectionNode.topLinePosition.to.y += gapY;
-      bottomLines[i].setAttribute("x2", parseInt(bottomLines[i].getAttribute("x2")) + gapX);
-      bottomLines[i].setAttribute("y2", parseInt(bottomLines[i].getAttribute("y2")) + gapY);
-    }
+  // 前のテンプレートからつながってるlineの終点を修正（多分ここもうちょいスマートにかけるはず）  
+  var preNormalNodes = getNormalNodesFromScenarioByNext(targetId);
+  for(var i=0; i<preNormalNodes.length; i++){
+    preNormalNodes[i].gui.topLinePosition.to.x += gapX;
+    preNormalNodes[i].gui.topLinePosition.to.y += gapY;
+    var bLineId = preNormalNodes[i].gui.topLineId;
+    var bLine = document.querySelector(`#${bLineId}`);
+    bLine.setAttribute("x2", parseInt(bLine.getAttribute("x2")) + gapX);
+    bLine.setAttribute("y2", parseInt(bLine.getAttribute("y2")) + gapY);
   }
 
+  var preSelectionNodes = getSelectionsFromScenarioByNext(targetId);
+  for(var i=0; i<preSelectionNodes.length; i++){
+    preSelectionNodes[i].topLinePosition.to.x += gapX;
+    preSelectionNodes[i].topLinePosition.to.y += gapY;
+    var bLineId = preSelectionNodes[i].topLineId;
+    var bLine = document.querySelector(`#${bLineId}`);
+    bLine.setAttribute("x2", parseInt(bLine.getAttribute("x2")) + gapX);
+    bLine.setAttribute("y2", parseInt(bLine.getAttribute("y2")) + gapY);
+  }
 
   // マウスボタンが離されたとき、またはカーソルが外れたとき発火
   drag.addEventListener("mouseup", mupOnNode, false);
@@ -466,8 +442,8 @@ var upOnLineStart = function(e){
 
   if(targetEventType=='normal'){
     // 前に描画したtoplineがあるなら削除してguiプロパティに新しいtopLineを追加
-    var pretopLine = targetEvent.gui.topLine;
-    if(pretopLine) pretopLine.parentNode.removeChild(pretopLine);
+    var preTopLine = document.querySelector(`#${targetEvent.gui.topLineId}`);
+    if(preTopLine) preTopLine.parentNode.removeChild(preTopLine);
 
     topLine.setAttribute('id', 'line-'+targetEvent.id);
     targetEvent.gui.topLineId = 'line-'+targetEvent.id;
@@ -477,8 +453,8 @@ var upOnLineStart = function(e){
     for(var i=0; i<selections.length; i++){
       if(targetSelectionEventId==selections[i].id){
         // 前に描画したtoplineがあるなら削除してguiプロパティに新しいtopLineを追加
-        var pretopLine = selections[i].topLine;
-        if(pretopLine) pretopLine.parentNode.removeChild(pretopLine);
+        var preTopLine = document.querySelector(`#${selections[i].topLineId}`);
+        if(preTopLine) preTopLine.parentNode.removeChild(preTopLine);
 
         topLine.setAttribute('id', 'line-'+targetSelectionEventId);
         //selections[i].topLine = topLine;
@@ -493,18 +469,11 @@ var upOnLineStart = function(e){
     } // for()
   }
 
+
+
+
   // ドラッグしているマウスがtemplateの上ならそのテンプレートとイベントをつなげる
   if(isOverTemplate){
-    // nextイベントをマウスオーバーしているテンプレートのイベントに紐付け
-    if(targetEventType=='normal'){
-      targetEvent.next = idOfOverTemplate;
-    }else if(targetEventType=='selection'){
-      for(var i=0; i<targetEvent.selections.length; i++){
-        if(targetEvent.selections[i].id==targetSelectionEventId){
-          targetEvent.selections[i].next = idOfOverTemplate;
-        }
-      }
-    }
 
     // topLineの終点をマウスオーバーしているテンプレートの座標に修正
     var elemX = parseInt(overTemplateElm.style.left);
@@ -512,6 +481,40 @@ var upOnLineStart = function(e){
     var offsetY = overTemplateElm.offsetHeight/2;
     topLine.setAttribute('x2', elemX);
     topLine.setAttribute('y2', elemY + offsetY);
+
+
+    // nextイベントをマウスオーバーしているテンプレートのイベントに紐付け
+    if(targetEventType=='normal'){
+
+      targetEvent.next = idOfOverTemplate;
+      var from = {x: arrowOrigin.x, y: arrowOrigin.y};
+      var to = {x: elemX, y: elemY + offsetY};
+      targetEvent.gui.topLinePosition = {origin: from, to: to};
+      targetEvent.topLineId = `line-${targetId}`;
+
+    }else if(targetEventType=='selection'){
+
+      for(var i=0; i<targetEvent.selections.length; i++){
+        if(targetEvent.selections[i].id==targetSelectionEventId){
+          targetEvent.selections[i].next = idOfOverTemplate;
+          var from = {x: arrowOrigin.x, y: arrowOrigin.y};
+          var to = {x: elemX, y: elemY + offsetY};
+          targetEvent.selections[i].topLinePosition = {origin: from, to: to};
+          targetEvent.selections[i].topLineId = `line-${selections[i].id}`;
+        }
+      }
+
+    }
+
+    
+
+    console.log('save');
+    $('#wrapSaving').fadeIn(400);
+    service.db.collection('projects').doc(riot.currentProjectId)
+      .update({'scenario': scenarioJson})
+      .then(function(){
+        $('#wrapSaving').fadeOut(400);
+      });
 
     /*
     // マウスオーバーしているテンプレートのbuttomLineを更新
@@ -523,9 +526,8 @@ var upOnLineStart = function(e){
       }
     }
     */
-
+    
   }else{
-    console.log('before pop', scenarioJson);
     // 終点にポップを出す
     var pop = document.querySelector('item-pop-after-drag');
     var popOffset = 66.5/2;
@@ -605,25 +607,27 @@ var getSelectionsFromScenarioContainNext = function(next){
 }
 */
 
-var getSelectionFromScenarioByNext = function(next){
-  /*
-  var selection;
-  for(var i=0; i<selections.length; i++){
-    if(selections[i].topLineId==next){
-      selection = selections[i];
+var getNormalNodesFromScenarioByNext = function(next){
+
+  var resultNodes = [];
+  for(var i=0; i<scenarioJson.length; i++){
+    if(scenarioJson[i].type=='normal' && scenarioJson[i].next == next){
+      resultNodes.push(scenarioJson[i]);
     }
   }
-  return selection;
-  */
+  return resultNodes;
 
-  var resultSelection;
+}
+
+var getSelectionsFromScenarioByNext = function(next){
+
+  var resultSelection = [];
   for(var i=0; i<scenarioJson.length; i++){
     if(scenarioJson[i].type=='selection'){
       var selections = scenarioJson[i].selections;
       for(var selection_i=0; selection_i<selections.length; selection_i++){
         if(selections[selection_i].next==next){
-          resultSelection = selections[selection_i];
-          break;
+          resultSelection.push(selections[selection_i]);
         }
       }
     }
