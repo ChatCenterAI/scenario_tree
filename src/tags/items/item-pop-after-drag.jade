@@ -1,6 +1,6 @@
 item-pop-after-drag
   div.wrap-item
-    p(onclick='{addSimpleMessage}').px12.pt8.pb7 Simple Message
+    p(onclick='{addSimple}').px12.pt8.pb7 Simple Message
     p(onclick='{addQuestion}').px12.pt8.pb7 Ask a Question
 
   style(scoped, type='less').
@@ -35,14 +35,30 @@ item-pop-after-drag
 
     var self = this;
 
-    this.addSimpleMessage = function(){
-
+    this.addSimple = function(){
+      
       // 前のイベントのtopLineの座標を保存
       //targetEvent.gui.topLinePosition = {origin: arrowOrigin, to: arrowTo};
-      console.log('中', scenarioJson);
+
+      var from = {x: arrowOrigin.x, y: arrowOrigin.y};
+      var to = {x: arrowTo.x, y: arrowTo.y};
+
+      // この時のターゲットはsimpleMessageそのものではない。
+      if(targetEvent.type=='normal'){
+        targetEvent.gui.topLinePosition = {origin: from, to: to};
+      }else if(targetEvent.type=='selection'){
+        targetEvent.topLinePosition = {origin: from, to: to};
+      }
+      
+
+      /*
       var event = getEventFromScenarioById(targetEvent.id);
-      event.gui.topLinePosition = {origin: arrowOrigin, to: arrowTo};
-      console.log('後', scenarioJson);
+      if(event.type=='normal'){
+        event.gui.topLinePosition = {origin: from, to: to};
+      }else if(event.type=='selection'){
+        debugger
+      }
+      */
 
       //debugger
       //var preEvent = getEventFromScenarioByNext(targetEvent.id);
@@ -61,18 +77,32 @@ item-pop-after-drag
 
       addSimpleMessage(arrowTo.x, arrowTo.y, content, false);
 
+      console.log('before adding', scenarioJson);
 
       // scenarioをupdateする
+      $('#wrapSaving').fadeIn(400);
       service.db.collection('projects').doc(opts.id)
-        .update({'scenario': scenarioJson});
+        .update({'scenario': scenarioJson})
+        .then(function(){
+          $('#wrapSaving').fadeOut(400);
+        });
 
       // ポップを消去
       var pop = document.querySelector('item-pop-after-drag');
       pop.classList.remove('show-pop');
 
+      console.log('after adding', scenarioJson);
     }
 
     this.addQuestion = function(){
+
+      var from = {x: arrowOrigin.x, y: arrowOrigin.y};
+      var to = {x: arrowTo.x, y: arrowTo.y};
+
+      var event = getEventFromScenarioById(targetEvent.id);
+      event.gui.topLinePosition = {origin: from, to: to};
+      
+
       var idRand = Math.floor(Math.random()*10000);
       var content = {
         id: 'selection-tmp' + idRand,
@@ -96,8 +126,13 @@ item-pop-after-drag
       var pop = document.querySelector('item-pop-after-drag');
       pop.classList.remove('show-pop');
 
+
+      $('#wrapSaving').fadeIn(400);
       service.db.collection('projects').doc(opts.id)
-        .update({'scenario': scenarioJson});
+        .update({'scenario': scenarioJson})
+        .then(function(){
+          $('#wrapSaving').fadeOut(400);
+        });
 
     }
 

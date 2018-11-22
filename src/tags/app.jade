@@ -8,6 +8,8 @@ app
   util-now-loading#loading
   util-now-loading#loadingForModal
   util-modal
+  div#wrapSaving
+    atom-now-loading-icon
 
   style(scoped, type='less').
     :scope {
@@ -89,6 +91,14 @@ app
           top: 0%;
           left: 0%;
         }
+      }
+
+      #wrapSaving {
+        display: none;
+        position: fixed;
+        top: 24px;
+        right: 32px;
+        z-index: 300;
       }
     }
 

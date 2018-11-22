@@ -11,21 +11,6 @@ var initCanvas = function(firstEventName){
   var width = canvas.offsetWidth;
   var height = canvas.offsetHeight;
 
-  /*
-  var event;
-  for(var i=0; i<scenarioJson.length; i++){
-    if(firstEventName==scenarioJson[i].id){
-      event = scenarioJson[i];
-      break;
-    }
-  }
-
-  var firstPos = event.gui.position;
-  
-  document.querySelector('module-canvas').scrollTop = firstPos.y - window.innerHeight/2 - 17;
-  addSimpleMessage(firstPos.x, firstPos.y, event, true);
-  */
-
   // nodeを追加
   var event;
   for(var i=0; i<scenarioJson.length; i++){
@@ -39,35 +24,41 @@ var initCanvas = function(firstEventName){
     // はじめのメッセージのところまでスクロール
     if(firstEventName==scenarioJson[i].id){
       document.querySelector('module-canvas').scrollLeft = pos.x - 100;
-      document.querySelector('module-canvas').scrollTop = pos.y - window.innerHeight/3 - 34;
+      document.querySelector('module-canvas').scrollTop = pos.y - window.innerHeight/3;
     }
 
   }
+
 
   // lineを追加
   for(var i=0; i<scenarioJson.length; i++){
     var type = scenarioJson[i].type;
     if(type == 'normal'){
-      var eId = scenarioJson[i].id;
-      var preEvent = getEventFromScenarioByNext(eId);
-      if(preEvent){
-        //scenarioJson[i].gui.topLinePosition.origin.y = preEvent.gui.topLinePosition.origin.y; //= scenarioJson[i].gui.topLinePosition.origin.y - 20;
-        //scenarioJson[i].gui.topLinePosition.to.y =  preEvent.gui.topLinePosition.to.y//= scenarioJson[i].gui.topLinePosition.to.y -20;
-
-        var arrowOrigin = scenarioJson[i].gui.topLinePosition.origin;
-        var arrowTo = scenarioJson[i].gui.topLinePosition.to;
+      if(scenarioJson[i].gui.topLinePosition){
+        var pos = scenarioJson[i].gui.topLinePosition;
+        var from = {x: pos.origin.x, y: pos.origin.y};
+        var to = {x: pos.to.x, y: pos.to.y};
         var topLineId = scenarioJson[i].gui.topLineId;
-        addLine(arrowOrigin, arrowTo, topLineId);
+        addLine(from, to, topLineId);
       }
     }else if(type == 'selection'){
-
+      var selections = scenarioJson[i].selections;
+      for(var selection_i=0; selection_i<selections.length; selection_i++){
+        if(selections[selection_i].topLinePosition){
+          var pos = selections[selection_i].topLinePosition;
+          var from = {x: pos.origin.x, y: pos.origin.y};
+          var to = {x: pos.to.x, y: pos.to.y};
+          var topLineId = selections[selection_i].topLineId;
+          addLine(from, to, topLineId);
+        }
+      }
     }
   } // for
+
 
 }
 
 var addSimpleMessage = function(x, y, content, isLoading){
-  debugger;
   // 前のイベントと関連づけする
   if(!(isLoading) && targetEvent && targetEvent.type!='selection') targetEvent.next = content.id;
 
@@ -82,18 +73,20 @@ var addSimpleMessage = function(x, y, content, isLoading){
     targetEvent.selections = selections;
   }
 
+
   // 最初の要素を入れ込む
   var itemWrapper = document.createElement('div');
   itemWrapper.classList.add('wrap-item-message');
   itemWrapper.dataset.id = content.id;
 
-  itemWrapper.addEventListener("mousedown", mdown, false);
-  itemWrapper.addEventListener("touchstart", mdown, false);
+  itemWrapper.addEventListener("mousedown", mdownOnNode, false);
+  itemWrapper.addEventListener("touchstart", mdownOnNode, false);
 
   canvas.appendChild(itemWrapper);
 
   riot.mount(itemWrapper, 'item-message', {content: content});
   riot.update();
+
 
   // 初期位置に配置
   var item = {};
@@ -104,11 +97,17 @@ var addSimpleMessage = function(x, y, content, isLoading){
 
   var style = itemWrapper.style;
   style.position = 'absolute';
-  style.left = `${item.x}px`;
-  style.top = `${item.y}px`;
+  
 
-  content.gui.position.x = item.x;
-  content.gui.position.y = item.y;
+  if(isLoading){
+    style.left = `${content.gui.position.x}px`;
+    style.top = `${content.gui.position.y}px`;
+  }else{
+    style.left = `${item.x}px`;
+    style.top = `${item.y}px`;
+    content.gui.position.x = item.x;
+    content.gui.position.y = item.y;
+  }
 
   // イベントをシナリオに追加
   if(!(isLoading)) scenarioJson.push(content);
@@ -137,8 +136,8 @@ var addSelections = function(x, y, content, isLoading){
   itemWrapper.classList.add('wrap-item-selection');
   itemWrapper.dataset.id = content.id;
 
-  itemWrapper.addEventListener("mousedown", mdown, false);
-  itemWrapper.addEventListener("touchstart", mdown, false);
+  itemWrapper.addEventListener("mousedown", mdownOnNode, false);
+  itemWrapper.addEventListener("touchstart", mdownOnNode, false);
 
   canvas.appendChild(itemWrapper);
 
@@ -154,15 +153,36 @@ var addSelections = function(x, y, content, isLoading){
 
   var style = itemWrapper.style;
   style.position = 'absolute';
-  style.left = `${item.x}px`;
-  style.top = `${item.y}px`;
 
-  content.gui.position.x = item.x;
-  content.gui.position.y = item.y;
+  if(isLoading){
+    style.left = `${content.gui.position.x}px`;
+    style.top = `${content.gui.position.y}px`;
+  }else{
+    style.left = `${item.x}px`;
+    style.top = `${item.y}px`;
+    content.gui.position.x = item.x;
+    content.gui.position.y = item.y;
+  }
 
   // イベントをシナリオに追加
   if(!(isLoading)) scenarioJson.push(content);
 }
+
+
+var addLine = function(arrowOrigin, arrowTo, id){
+  var topLine = document.createElementNS('http://www.w3.org/2000/svg','line');
+  topLine.setAttribute('x1', arrowOrigin.x);
+  topLine.setAttribute('y1', arrowOrigin.y);
+  topLine.setAttribute('x2', arrowTo.x);
+  topLine.setAttribute('y2', arrowTo.y);
+  topLine.setAttribute('stroke', '#1976d2');
+  topLine.setAttribute('id', id);
+
+  canvasSvg.appendChild(topLine);
+
+  return topLine;
+}
+
 
 
 
@@ -171,12 +191,11 @@ var addSelections = function(x, y, content, isLoading){
 var targetId;
 var targetEvent;
 var targetSelectionEventId
-//var targetIndex;
 var targetEventType;
 
 var x, y;
 //マウスが押された際の関数
-var mdown = function(e) {
+var mdownOnNode = function(e) {
 
   e.stopPropagation();
   
@@ -191,11 +210,11 @@ var mdown = function(e) {
   for(var i=0; i<scenarioJson.length; i++){
     if(targetId==scenarioJson[i].id){
       targetEvent = scenarioJson[i];
-      //targetIndex = i;
       break;
     }
   }
   targetEventType = targetEvent.type;
+
   /*
   if(targetEventType=='selection'){
     targetSelectionEventId = e.target.dataset.selectionid;
@@ -211,13 +230,13 @@ var mdown = function(e) {
 
   
   //ムーブイベントにコールバック
-  document.body.addEventListener("mousemove", mmove, false);
-  document.body.addEventListener("touchmove", mmove, false);
+  document.body.addEventListener("mousemove", mmoveOnNode, false);
+  document.body.addEventListener("touchmove", mmoveOnNode, false);
 
 }
 
 //マウスカーソルが動いたときに発火
-var mmove = function(e) {
+var mmoveOnNode = function(e) {
 
   e.stopPropagation();
   
@@ -250,14 +269,22 @@ var mmove = function(e) {
   // 次のテンプレートにつないでいるlineの始点を修正
   var topLine = document.querySelector(`#${targetEvent.gui.topLineId}`);//targetEvent.gui.topLine;
   if(topLine){
+    targetEvent.gui.topLinePosition.origin.x += gapX;
+    targetEvent.gui.topLinePosition.origin.y += gapY;
+    
     topLine.setAttribute("x1", parseInt(topLine.getAttribute("x1")) + gapX);
     topLine.setAttribute("y1", parseInt(topLine.getAttribute("y1")) + gapY);
+
   }
 
   if(targetEventType=='selection'){
     var selections = targetEvent.selections;
     for(var i=0; i<selections.length; i++){
       if(selections[i].topLineId){
+        if(selections[i].topLinePosition){
+          selections[i].topLinePosition.origin.x += gapX;
+          selections[i].topLinePosition.origin.y += gapY;
+        }
         var selectionTopLine = document.querySelector(`#${selections[i].topLineId}`);
         selectionTopLine.setAttribute("x1", parseInt(selectionTopLine.getAttribute("x1")) + gapX);
         selectionTopLine.setAttribute("y1", parseInt(selectionTopLine.getAttribute("y1")) + gapY);
@@ -267,6 +294,7 @@ var mmove = function(e) {
 
   // 前のテンプレートからつながってるlineの終点を修正
   var bottomLines = [];
+  var bottomLineEvents = [];
   for(var i=0; i<scenarioJson.length; i++){
 
     if(scenarioJson[i].type=='normal'){
@@ -274,6 +302,7 @@ var mmove = function(e) {
       if(scenarioJson[i].next==targetId){
         var bLine = document.querySelector(`#${scenarioJson[i].gui.topLineId}`);
         bottomLines.push(bLine);
+        bottomLineEvents.push(scenarioJson[i]);
       }
 
     }else if(scenarioJson[i].type=='selection'){
@@ -283,6 +312,7 @@ var mmove = function(e) {
           var bLineId = scenarioJson[i].selections[selection_i].topLineId;
           var bLine = document.querySelector(`#${bLineId}`);
           bottomLines.push(bLine);
+          bottomLineEvents.push(scenarioJson[i]);
         }
       } // for
 
@@ -290,41 +320,56 @@ var mmove = function(e) {
   } // for
   
   for(var i=0; i<bottomLines.length; i++){
-    bottomLines[i].setAttribute("x2", parseInt(bottomLines[i].getAttribute("x2")) + gapX);
-    bottomLines[i].setAttribute("y2", parseInt(bottomLines[i].getAttribute("y2")) + gapY);
+    var type = bottomLineEvents[i].type;
+    if(type=='normal'){
+      bottomLineEvents[i].gui.topLinePosition.to.x += gapX;
+      bottomLineEvents[i].gui.topLinePosition.to.y += gapY;
+      bottomLines[i].setAttribute("x2", parseInt(bottomLines[i].getAttribute("x2")) + gapX);
+      bottomLines[i].setAttribute("y2", parseInt(bottomLines[i].getAttribute("y2")) + gapY);
+    }else if(type=='selection'){
+      // TO Do いまここを通そうとしてるよ
+      var preSelectionNode = getSelectionFromScenarioByNext(targetId);
+      preSelectionNode.topLinePosition.to.x += gapX;
+      preSelectionNode.topLinePosition.to.y += gapY;
+      bottomLines[i].setAttribute("x2", parseInt(bottomLines[i].getAttribute("x2")) + gapX);
+      bottomLines[i].setAttribute("y2", parseInt(bottomLines[i].getAttribute("y2")) + gapY);
+    }
   }
 
 
   // マウスボタンが離されたとき、またはカーソルが外れたとき発火
-  drag.addEventListener("mouseup", mup, false);
-  drag.addEventListener("touchend", mup, false);
+  drag.addEventListener("mouseup", mupOnNode, false);
+  drag.addEventListener("touchend", mupOnNode, false);
 
-
-  document.body.addEventListener("mouseleave", mup, false);
-  document.body.addEventListener("touchleave", mup, false);
+  document.body.addEventListener("mouseleave", mupOnNode, false);
+  document.body.addEventListener("touchleave", mupOnNode, false);
 }
 
 //マウスボタンが上がったら発火
-var mup = function(e) {
+var mupOnNode = function(e) {
 
   e.stopPropagation();
 
   var drag = document.getElementsByClassName("drag")[0];
 
   if(drag){
-    drag.removeEventListener("mouseup", mup, false);
-    drag.removeEventListener("touchend", mup, false);
+    drag.removeEventListener("mouseup", mupOnNode, false);
+    drag.removeEventListener("touchend", mupOnNode, false);
     //クラス名 .drag も消す
     drag.classList.remove("drag");
 
     console.log('save');
+    $('#wrapSaving').fadeIn(400);
     service.db.collection('projects').doc(riot.currentProjectId)
-        .update({'scenario': scenarioJson});
+        .update({'scenario': scenarioJson})
+        .then(function(){
+          $('#wrapSaving').fadeOut(400);
+        });
   }
 
   //ムーブベントハンドラの消去
-  document.body.removeEventListener("mousemove", mmove, false);
-  document.body.removeEventListener("touchmove", mmove, false);
+  document.body.removeEventListener("mousemove", mmoveOnNode, false);
+  document.body.removeEventListener("touchmove", mmoveOnNode, false);
  
 }
 
@@ -347,9 +392,9 @@ var arrowTo = {};
 // ドラック中かどうかを判定
 var isDraging = false;
 
-var mdownOnNode = function(e){
+var mdownOnLineStart = function(e){
   e.stopPropagation();
-  console.log('前前前', scenarioJson);
+  
   isDraging = true;
 
   if(e.type === "mousedown") {
@@ -362,13 +407,6 @@ var mdownOnNode = function(e){
   targetId = $(e.target).parents('.message')[0].dataset.id;
   
   targetEvent = getEventFromScenarioById(targetId);
-  /*for(var i=0; i<scenarioJson.length; i++){
-    if(targetId==scenarioJson[i].id){
-      targetEvent = scenarioJson[i];
-      //targetIndex = i;
-      break;
-    }
-  }*/
   targetEventType = targetEvent.type;
 
   if(targetEventType=='selection'){
@@ -387,11 +425,11 @@ var mdownOnNode = function(e){
   //arrowOrigin.x = left + buttonOffset + canvasWrapper.scrollLeft;
   //arrowOrigin.y = top + buttonOffset + canvas.scrollTop;
 
-  document.body.addEventListener("mousemove", moveOnNode, false);
+  document.body.addEventListener("mousemove", moveOnLineStart, false);
 }
 
-var moveOnNode = function(e){
-  console.log('前前', scenarioJson);
+var moveOnLineStart = function(e){
+  
   if(e.type === "mousemove") {
     var event = e;
   } else {
@@ -412,10 +450,10 @@ var moveOnNode = function(e){
   lineForPreview.setAttribute('stroke', '#1976d2');
 
 
-  document.body.addEventListener("mouseup", upOnNode, false);
+  document.body.addEventListener("mouseup", upOnLineStart, false);
 }
 
-var upOnNode = function(e){
+var upOnLineStart = function(e){
 
   isDraging = false;
 
@@ -426,21 +464,14 @@ var upOnNode = function(e){
   // 次のテンプレートにつなぐlineを追加
   var topLine = addLine(arrowOrigin, arrowTo, targetEvent.id);
 
-  console.log('前', scenarioJson);
-
   if(targetEventType=='normal'){
     // 前に描画したtoplineがあるなら削除してguiプロパティに新しいtopLineを追加
     var pretopLine = targetEvent.gui.topLine;
     if(pretopLine) pretopLine.parentNode.removeChild(pretopLine);
 
-    topLine.setAttribute('id', 'line-' + targetEvent.id);
-    //targetEvent.gui.topLine = topLine;
-    targetEvent.gui.topLineId = 'line-' + targetEvent.id;
+    topLine.setAttribute('id', 'line-'+targetEvent.id);
+    targetEvent.gui.topLineId = 'line-'+targetEvent.id;
 
-    //targetEvent.gui.topLinePosition = {origin: arrowOrigin, to:arrowTo};
-    
-    //var preEvent = getEventFromScenarioByNext(targetEvent.id);
-    // preEvent.gui.topLinePosition = {origin: arrowOrigin, to:arrowTo};
   }else if(targetEventType=='selection'){
     var selections = targetEvent.selections;
     for(var i=0; i<selections.length; i++){
@@ -449,9 +480,15 @@ var upOnNode = function(e){
         var pretopLine = selections[i].topLine;
         if(pretopLine) pretopLine.parentNode.removeChild(pretopLine);
 
-        topLine.setAttribute('id', targetSelectionEventId);
+        topLine.setAttribute('id', 'line-'+targetSelectionEventId);
         //selections[i].topLine = topLine;
-        selections[i].topLineId = targetSelectionEventId;
+        selections[i].topLineId = 'line-'+targetSelectionEventId;
+
+        // topLinePositionを追加
+        var from = {x: arrowOrigin.x, y: arrowOrigin.y};
+        var to = {x: arrowTo.x, y: arrowTo.y};
+
+        selections[i].topLinePosition = {origin: from, to: to};
       }
     } // for()
   }
@@ -488,6 +525,7 @@ var upOnNode = function(e){
     */
 
   }else{
+    console.log('before pop', scenarioJson);
     // 終点にポップを出す
     var pop = document.querySelector('item-pop-after-drag');
     var popOffset = 66.5/2;
@@ -496,8 +534,8 @@ var upOnNode = function(e){
     pop.classList.add('show-pop');
   }
 
-  document.body.removeEventListener("mousemove", moveOnNode, false);
-  document.body.removeEventListener("mouseup", upOnNode, false);
+  document.body.removeEventListener("mousemove", moveOnLineStart, false);
+  document.body.removeEventListener("mouseup", upOnLineStart, false);
 }
 
 
@@ -519,7 +557,6 @@ var isOverTemplate = false;
 var idOfOverTemplate, overTemplateElm;
 var moverTemplate = function(e){
   isOverTemplate = true;
-
   if(isDraging){
     var targetElem = e.currentTarget;
     overTemplateElm = targetElem;
@@ -530,27 +567,11 @@ var moverTemplate = function(e){
 
 var moutTemplate = function(e){
   isOverTemplate = false;
-
   var targetElem = e.currentTarget;
   idOfOverTemplate = targetElem.dataset.id;
   targetElem.classList.remove('active-over');
 }
 
-
-
-var addLine = function(arrowOrigin, arrowTo, id){
-  var topLine = document.createElementNS('http://www.w3.org/2000/svg','line');
-  topLine.setAttribute('x1', arrowOrigin.x);
-  topLine.setAttribute('y1', arrowOrigin.y);
-  topLine.setAttribute('x2', arrowTo.x);
-  topLine.setAttribute('y2', arrowTo.y);
-  topLine.setAttribute('stroke', '#1976d2');
-  topLine.setAttribute('id', id);
-
-  canvasSvg.appendChild(topLine);
-
-  return topLine;
-}
 
 
 // あるidを持つイベントをシナリオから取り出す
@@ -575,3 +596,42 @@ var getEventFromScenarioByNext = function(next){
   }
   return event;
 }
+
+/*
+var getSelectionsFromScenarioContainNext = function(next){
+  for(var i=0; i<scenarioJson.length; i++){
+
+  }
+}
+*/
+
+var getSelectionFromScenarioByNext = function(next){
+  /*
+  var selection;
+  for(var i=0; i<selections.length; i++){
+    if(selections[i].topLineId==next){
+      selection = selections[i];
+    }
+  }
+  return selection;
+  */
+
+  var resultSelection;
+  for(var i=0; i<scenarioJson.length; i++){
+    if(scenarioJson[i].type=='selection'){
+      var selections = scenarioJson[i].selections;
+      for(var selection_i=0; selection_i<selections.length; selection_i++){
+        if(selections[selection_i].next==next){
+          resultSelection = selections[selection_i];
+          break;
+        }
+      }
+    }
+  }
+
+  return resultSelection;
+}
+
+
+
+

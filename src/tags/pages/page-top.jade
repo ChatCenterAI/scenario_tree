@@ -56,12 +56,13 @@ page-top
     }
 
     this.on('mount', function(){
-
+      
     });
 
     this.loadProjects = async ()=>{
       
       var projects = await service.db.collection("projects")
+        .orderBy("editedAt", "desc")
         .where('author', '==', session.user.uid)
         .get().then(function(querySelectors){
           var projects = [];
