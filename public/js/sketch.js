@@ -334,13 +334,7 @@ var mupOnNode = function(e) {
     //クラス名 .drag も消す
     drag.classList.remove("drag");
 
-    console.log('save');
-    $('#wrapSaving').fadeIn(400);
-    service.db.collection('projects').doc(riot.currentProjectId)
-        .update({'scenario': scenarioJson})
-        .then(function(){
-          $('#wrapSaving').fadeOut(400);
-        });
+    saveScenario();
   }
 
   //ムーブベントハンドラの消去
@@ -395,11 +389,20 @@ var mdownOnLineStart = function(e){
   arrowOrigin.x = button.left + buttonOffset + canvas.scrollLeft;
   arrowOrigin.y = button.top + buttonOffset + canvas.scrollTop-48;
 
-  //var $message = $(event.target).parents('.message');
-  //var top = $message.offset().top;
-  //var left = $message.offset().left;
-  //arrowOrigin.x = left + buttonOffset + canvasWrapper.scrollLeft;
-  //arrowOrigin.y = top + buttonOffset + canvas.scrollTop;
+  
+  // セーブされていないlineがあったら削除してポップがでてたらそれも消す
+  var unsavedLine = document.querySelector('.unsaved');
+  if(unsavedLine){
+    unsavedLine.parentNode.removeChild(unsavedLine);
+    var pop = document.querySelector('item-pop-after-drag');
+    pop.classList.remove('show-pop');
+
+    var nodeId = unsavedLine.id.split('-')[1];
+    var node = getNodeFromScenarioById(nodeId);
+    delete node.topLineId;
+    delete node.topLinePosition;
+  }
+
 
   document.body.addEventListener("mousemove", moveOnLineStart, false);
 }
@@ -439,6 +442,8 @@ var upOnLineStart = function(e){
 
   // 次のテンプレートにつなぐlineを追加
   var topLine = addLine(arrowOrigin, arrowTo, targetEvent.id);
+  topLine.classList.add('unsaved');
+
 
   if(targetEventType=='normal'){
     // 前に描画したtoplineがあるなら削除してguiプロパティに新しいtopLineを追加
@@ -468,8 +473,6 @@ var upOnLineStart = function(e){
       }
     } // for()
   }
-
-
 
 
   // ドラッグしているマウスがtemplateの上ならそのテンプレートとイベントをつなげる
@@ -507,26 +510,14 @@ var upOnLineStart = function(e){
     }
 
     
-
-    console.log('save');
     $('#wrapSaving').fadeIn(400);
     service.db.collection('projects').doc(riot.currentProjectId)
       .update({'scenario': scenarioJson})
       .then(function(){
+        console.log('save');
         $('#wrapSaving').fadeOut(400);
       });
 
-    /*
-    // マウスオーバーしているテンプレートのbuttomLineを更新
-    for(var i=0; i<scenarioJson.length; i++){
-      if(idOfOverTemplate == scenarioJson[i].id){
-        scenarioJson[i].gui.buttomLine = topLine;
-        debugger
-        break;
-      }
-    }
-    */
-    
   }else{
     // 終点にポップを出す
     var pop = document.querySelector('item-pop-after-drag');
@@ -550,11 +541,26 @@ var upOnLineStart = function(e){
 
 
 
+// scenarioのセーブ
+var saveScenario = function(){
+
+  var unsavedLine = document.querySelector('.unsaved');
+  if(unsavedLine) unsavedLine.classList.remove('unsaved');
+
+  $('#wrapSaving').fadeIn(400);
+  service.db.collection('projects').doc(riot.currentProjectId)
+    .update({'scenario': scenarioJson})
+    .then(function(){
+      $('#wrapSaving').fadeOut(400);
+      console.log('save');
+    });
+
+}
 
 
 
 
-
+// ノードの上にドラッグ中のカーソルがのっているかを判定
 var isOverTemplate = false;
 var idOfOverTemplate, overTemplateElm;
 var moverTemplate = function(e){
@@ -599,13 +605,26 @@ var getEventFromScenarioByNext = function(next){
   return event;
 }
 
-/*
-var getSelectionsFromScenarioContainNext = function(next){
-  for(var i=0; i<scenarioJson.length; i++){
 
-  }
+var getNodeFromScenarioById = function(id){
+  var node;
+  for(var i=0; i<scenarioJson.length; i++){
+    if(scenarioJson[i].type == 'normal'){
+      
+      if(scenarioJson[i].id == id) node = scenarioJson[i];
+
+    }else if(scenarioJson[i].type == 'selection'){
+
+      var selections = scenarioJson[i].selections;
+      for(var selection_i=0; selection_i<selections.length; selection_i++){
+        if(selections[selection_i].id == id) node = selections[selection_i];
+      }
+
+    }
+  } // for
+  return node;
 }
-*/
+
 
 var getNormalNodesFromScenarioByNext = function(next){
 

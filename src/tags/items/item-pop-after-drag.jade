@@ -83,16 +83,9 @@ item-pop-after-drag
 
       addSimpleMessage(arrowTo.x, arrowTo.y, content, false);
 
-      console.log('before adding', scenarioJson);
 
       // scenarioをupdateする
-      $('#wrapSaving').fadeIn(400);
-      service.db.collection('projects').doc(opts.id)
-        .update({'scenario': scenarioJson})
-        .then(function(){
-          $('#wrapSaving').fadeOut(400);
-        });
-
+      saveScenario();
 
 
       // ポップを消去
@@ -135,12 +128,7 @@ item-pop-after-drag
       pop.classList.remove('show-pop');
 
 
-      $('#wrapSaving').fadeIn(400);
-      service.db.collection('projects').doc(opts.id)
-        .update({'scenario': scenarioJson})
-        .then(function(){
-          $('#wrapSaving').fadeOut(400);
-        });
+      saveScenario();
 
     }
 
