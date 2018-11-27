@@ -13,7 +13,8 @@ module-inspector-normal
       .wrap-module {
         .title {
           color: #1976d2;
-          font-weight: 400;
+          font-weight: 600;
+          font-size: 16px;
         }
         textarea {
           border: solid rgba(0,0,0,0.4) 0.5px;
@@ -81,6 +82,7 @@ module-inspector-normal
         //self.content.gui.topLinePosition.origin.y = y;
       }
 
+      // 変更をscenarioArrayに反映して保存
       for(var i=0; i<scenarioArray.length; i++){
         if(scenarioArray[i].id==self.content.id){
           scenarioArray[i] = self.content;

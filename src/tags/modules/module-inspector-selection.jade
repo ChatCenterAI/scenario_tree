@@ -1,9 +1,15 @@
 module-inspector-selection
   div.wrap-module.px8.pt16
     p.title.mb12 Selection
-    div
-      textarea(each='{item in selections}' placeholder="Selection").pt3.pb4.px4.mr6 item.label
-      p(onclick='{createProject}').wrap-button.px10.py8 Save
+    div.wrap-ask.mb10
+      textarea(placeholder="What is your choice?")#messageInput.pt3.pb4.px4.mr6 {text}
+    div.mb4
+      p.title-buttons.mb8 Buttons
+      textarea(each='{item in selections}' placeholder="Selection").textarea-selection.pt3.pb4.px4.mr6 {item.label}
+    div(onclick='{addSelection}').wrap-add.mb12.f.fm
+      img(src='./img/icon/add-blue.svg').add-icon.mr4
+      p.add-text Add Button
+    p(onclick='{save}').wrap-button.px10.py8 Save
 
   style(scoped, type='less').
     :scope {
@@ -12,7 +18,8 @@ module-inspector-selection
       .wrap-module {
         .title {
           color: #1976d2;
-          font-weight: 400;
+          font-weight: 600;
+          font-size: 16px;
         }
         textarea {
           border: solid rgba(0,0,0,0.4) 0.5px;
@@ -22,6 +29,25 @@ module-inspector-selection
           outline: none;
           resize: none;
           letter-spacing: 0.6px;
+        }
+        #messageInput {
+          height: 84px;
+        }
+        .title-buttons {
+          color: #1976d2;
+          font-weight: 400;
+          font-size: 14px;
+        }
+        .wrap-add {
+          cursor: pointer;
+          .add-icon {
+            width: 24px;
+            height: 24px;
+          }
+          .add-text {
+            color: #1976d2;
+            font-size: 12px;
+          }
         }
         .wrap-button {
           cursor: pointer;
@@ -40,9 +66,67 @@ module-inspector-selection
 
     var self = this;
     this.content = opts.__proto__.content;
+    this.text = this.content.text;
     this.selections = this.content.selections;
-
 
     this.on('mount', function(){
 
     });
+
+    this.addSelection = function(){
+      // ノードを追加
+      self.content.addedSelectionsCounter++;
+      self.selections.push({
+        label: 'Selection',
+        id: `selectionTmp${scenarioArray.length}-selection${this.content.addedSelectionsCounter}`,
+      });
+      self.update();
+
+    }
+
+    this.save = function() {
+
+      var askElem = document.getElementById('messageInput');
+      self.content.text = askElem.value;
+
+      var selectionTextareas = document.getElementsByClassName('textarea-selection');
+      for(var i=0; i<selectionTextareas.length; i++){
+        this.content.selections[i].label = selectionTextareas[i].value;
+        if(selectionTextareas[i].value=='') selectionTextareas[i].value = 'No Text';
+      }
+
+      // ノードの追加をGUIに反映
+      var targetElem = document.getElementById(self.content.id);
+      var preHeight = targetElem.offsetHeight;
+
+      riot.mount(targetElem, 'item-selection', {content: self.content});
+      riot.update();
+
+      var gapY = targetElem.offsetHeight - preHeight;
+
+      targetElem.style.top = (parseInt(targetElem.style.top) - gapY/2) + 'px';
+      self.content.gui.position.y = parseInt(targetElem.style.top);
+
+      // selectionsのtopLineのoriginを調整
+      for(var i=0; i<self.content.selections.length; i++){
+        if(self.content.selections[i].topLinePosition){
+          var selectionId = self.content.selections[i].id;
+          var topLine = document.getElementById(`line-${selectionId}`);
+          var preY = parseInt(topLine.getAttribute('y1'));
+          topLine.setAttribute('y1', preY-gapY/2);
+          self.content.selections[i].topLinePosition.origin.y -= gapY/2;
+        }
+      }
+
+      // 変更をscenarioArrayに反映して保存
+      for(var i=0; i<scenarioArray.length; i++){
+        if(scenarioArray[i].id==self.content.id){
+          scenarioArray[i] = self.content;
+        }
+      }
+
+      saveScenario();
+    }
+
+
+
