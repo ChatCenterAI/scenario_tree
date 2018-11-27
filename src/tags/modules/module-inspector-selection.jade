@@ -1,0 +1,48 @@
+module-inspector-selection
+  div.wrap-module.px8.pt16
+    p.title.mb12 Selection
+    div
+      textarea(each='{item in selections}' placeholder="Selection").pt3.pb4.px4.mr6 item.label
+      p(onclick='{createProject}').wrap-button.px10.py8 Save
+
+  style(scoped, type='less').
+    :scope {
+      width: 100%;
+      height: 100%;
+      .wrap-module {
+        .title {
+          color: #1976d2;
+          font-weight: 400;
+        }
+        textarea {
+          border: solid rgba(0,0,0,0.4) 0.5px;
+          border-radius: 3px;
+          width: 100%;
+          height: 28px;
+          outline: none;
+          resize: none;
+          letter-spacing: 0.6px;
+        }
+        .wrap-button {
+          cursor: pointer;
+          text-align: center;
+          background: #1976d2;
+          color: #fff;
+          letter-spacing: 0.6px;
+          font-size: 12px;
+          font-weight: 400;
+          border-radius: 3px;
+        }
+      }
+    }
+
+  script.
+
+    var self = this;
+    this.content = opts.__proto__.content;
+    this.selections = this.content.selections;
+
+
+    this.on('mount', function(){
+
+    });

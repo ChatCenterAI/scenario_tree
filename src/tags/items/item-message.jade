@@ -1,6 +1,6 @@
 item-message(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='{id}' data-id='{id}').node
   div.wrap-item.f.fm.flex-between
-    p.px12.pt8.pb7 {text}
+    p.text.line-clamp-1.pl12.pr8.pt8.pb7 {text}
     div(onmousedown='{down}').wrap-drag-button.pr8.f.fm
       div.drag-button
 
@@ -25,11 +25,13 @@ item-message(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='{id}'
       .wrap-item {
         overflow: visible;
         p {
-          white-space: nowrap;
+          /*white-space: nowrap;*/
           display: inline-block;
           color: #1976d2;
           letter-spacing: 0.6px;
           font-weight: 300;
+          width: 100%;
+          max-width: 180px;
         }
         .wrap-drag-button {
           cursor: pointer;

@@ -76,6 +76,7 @@ var addSimpleMessage = function(x, y, content, isLoading){
   var itemWrapper = document.createElement('div');
   itemWrapper.classList.add('wrap-item-message');
   itemWrapper.dataset.id = content.id;
+  itemWrapper.id = content.id;
 
   itemWrapper.addEventListener("mousedown", mdownOnNode, false);
   itemWrapper.addEventListener("touchstart", mdownOnNode, false);
@@ -133,6 +134,7 @@ var addSelections = function(x, y, content, isLoading){
   var itemWrapper = document.createElement('div');
   itemWrapper.classList.add('wrap-item-selection');
   itemWrapper.dataset.id = content.id;
+  itemWrapper.id = content.id;
 
   itemWrapper.addEventListener("mousedown", mdownOnNode, false);
   itemWrapper.addEventListener("touchstart", mdownOnNode, false);
@@ -546,11 +548,25 @@ var clickOnNode = function(e){
       break;
     }
   }
-  targetEventNodeType = targetEvent.nodeType;
+  targetEventType = targetEvent.type;
 
   console.log(targetEvent);
 
-  
+  switch(targetEventType){
+    case 'normal':
+
+      riot.mount('inspector', 'module-inspector-normal', {content: targetEvent});
+      riot.update();
+
+    break;
+    case 'selection':
+
+      riot.mount('inspector', 'module-inspector-selection', {content: targetEvent});
+      riot.update();
+
+    break;
+  }
+
 
 }
 

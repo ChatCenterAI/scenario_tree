@@ -73,7 +73,7 @@ item-pop-after-drag
 
       // contentを作成
       var content = {
-        id: 'simple-tmp' + scenarioArray.length,
+        id: 'simpleTmp' + scenarioArray.length,
         num: scenarioArray.length,
         type: 'normal',
         nodeType: 'single',
@@ -106,18 +106,16 @@ item-pop-after-drag
       event.gui.topLinePosition = {origin: from, to: to};
       
 
-      var idRand = Math.floor(Math.random()*10000);
+      //var idRand = Math.floor(Math.random()*10000);
       var content = {
-        id: 'selection-tmp' + idRand,
+        id: 'selectionTmp' + scenarioArray.length,
         num: scenarioArray.length,
         type: 'selection',
         nodeType: 'group',
-        text: 'How are you?: '+idRand,
+        text: 'How are you?:' + scenarioArray.length,//+idRand,
+        addedSelectionsCounter : 0,
         selections: [
-          {label: 'I am so fine', id: 'selection' + Math.floor(Math.random()*10000)},
-          {label:'Not good', id: 'selection' + Math.floor(Math.random()*10000)},
-          {label:'I am too sleepy', id: 'selection' + Math.floor(Math.random()*10000)},
-          {label:'Others', id: 'selection' + Math.floor(Math.random()*10000)}
+          {label: 'Others', id: 'selection' + 0},
         ],
         gui: {
           position: {},
