@@ -6,6 +6,7 @@ module-canvas#canvas
 
   style(scoped, type='less').
     :scope {
+      flex-grow: 1;
       position: relative;
       display: block;
       overflow: scroll;
@@ -60,7 +61,7 @@ module-canvas#canvas
 
       var firstEventName = `first-${self.project.id}`;
 
-      scenarioJson = self.project.scenario;
+      scenarioArray = self.project.scenario;
       initCanvas(firstEventName);
 
       $('#loading').fadeOut(400);

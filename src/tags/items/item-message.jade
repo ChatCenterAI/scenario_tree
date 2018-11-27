@@ -1,4 +1,4 @@
-item-message(onmouseover='{over}' onmouseout='{out}' id='{id}' data-id='{id}').message
+item-message(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='{id}' data-id='{id}').node
   div.wrap-item.f.fm.flex-between
     p.px12.pt8.pb7 {text}
     div(onmousedown='{down}').wrap-drag-button.pr8.f.fm
@@ -53,7 +53,7 @@ item-message(onmouseover='{over}' onmouseout='{out}' id='{id}' data-id='{id}').m
 
     this.down = mdownOnLineStart;
 
-
+    this.click = clickOnNode;
     this.over = moverTemplate;
     this.out = moutTemplate;
     

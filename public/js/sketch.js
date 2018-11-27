@@ -1,11 +1,9 @@
 
-
-var canvas, canvasSvg, canvasWrapper;
+var canvas, canvasSvg;
 
 var initCanvas = function(firstEventName){
 
   canvas = document.querySelector('module-canvas');
-  canvasWrapper = document.querySelector('#wrapCanvas');
   canvasSvg = document.querySelector('#canvasSvg');
   
   var width = canvas.offsetWidth;
@@ -13,36 +11,36 @@ var initCanvas = function(firstEventName){
 
   // nodeを追加
   var event;
-  for(var i=0; i<scenarioJson.length; i++){
+  for(var i=0; i<scenarioArray.length; i++){
     
-    event = scenarioJson[i];
+    event = scenarioArray[i];
     var pos = event.gui.position;
   
-    if(scenarioJson[i].type == 'normal') addSimpleMessage(pos.x, pos.y, event, true);
-    if(scenarioJson[i].type == 'selection') addSelections(pos.x, pos.y, event, true);
+    if(scenarioArray[i].nodeType == 'single') addSimpleMessage(pos.x, pos.y, event, true);
+    if(scenarioArray[i].nodeType == 'group') addSelections(pos.x, pos.y, event, true);
     
     // はじめのメッセージのところまでスクロール
-    if(firstEventName==scenarioJson[i].id){
+    if(firstEventName==scenarioArray[i].id){
       document.querySelector('module-canvas').scrollLeft = pos.x - 100;
-      document.querySelector('module-canvas').scrollTop = pos.y - window.innerHeight/3;
+      document.querySelector('module-canvas').scrollTop = pos.y - window.innerHeight/2;
     }
 
   }
 
 
   // lineを追加
-  for(var i=0; i<scenarioJson.length; i++){
-    var type = scenarioJson[i].type;
-    if(type == 'normal'){
-      if(scenarioJson[i].gui.topLinePosition){
-        var pos = scenarioJson[i].gui.topLinePosition;
+  for(var i=0; i<scenarioArray.length; i++){
+    var nodeType = scenarioArray[i].nodeType;
+    if(nodeType == 'single'){
+      if(scenarioArray[i].gui.topLinePosition){
+        var pos = scenarioArray[i].gui.topLinePosition;
         var from = {x: pos.origin.x, y: pos.origin.y};
         var to = {x: pos.to.x, y: pos.to.y};
-        var topLineId = scenarioJson[i].gui.topLineId;
+        var topLineId = scenarioArray[i].gui.topLineId;
         addLine(from, to, topLineId);
       }
-    }else if(type == 'selection'){
-      var selections = scenarioJson[i].selections;
+    }else if(nodeType == 'group'){
+      var selections = scenarioArray[i].selections;
       for(var selection_i=0; selection_i<selections.length; selection_i++){
         if(selections[selection_i].topLinePosition){
           var pos = selections[selection_i].topLinePosition;
@@ -60,9 +58,9 @@ var initCanvas = function(firstEventName){
 
 var addSimpleMessage = function(x, y, content, isLoading){
   // 前のイベントと関連づけする
-  if(!(isLoading) && targetEvent && targetEvent.type!='selection') targetEvent.next = content.id;
+  if(!(isLoading) && targetEvent && targetEvent.nodeType!='group') targetEvent.next = content.id;
 
-  if(!(isLoading) && targetEvent && targetEvent.type=='selection'){
+  if(!(isLoading) && targetEvent && targetEvent.nodeType=='group'){
     
     var selections = targetEvent.selections;
     for(var i=0; i<selections.length; i++){
@@ -110,7 +108,7 @@ var addSimpleMessage = function(x, y, content, isLoading){
   }
 
   // イベントをシナリオに追加
-  if(!(isLoading)) scenarioJson.push(content);
+  if(!(isLoading)) scenarioArray.push(content);
   
 }
 
@@ -120,7 +118,7 @@ var addSelections = function(x, y, content, isLoading){
   // 前のイベントと関連づけする
   if(!(isLoading) && targetEvent) targetEvent.next = content.id;
 
-  if(!(isLoading) && targetEvent && targetEvent.type=='selection'){
+  if(!(isLoading) && targetEvent && targetEvent.nodeType=='selection'){
     
     var selections = targetEvent.selections;
     for(var i=0; i<selections.length; i++){
@@ -165,7 +163,7 @@ var addSelections = function(x, y, content, isLoading){
   }
 
   // イベントをシナリオに追加
-  if(!(isLoading)) scenarioJson.push(content);
+  if(!(isLoading)) scenarioArray.push(content);
 }
 
 
@@ -191,7 +189,7 @@ var addLine = function(arrowOrigin, arrowTo, id){
 var targetId;
 var targetEvent;
 var targetSelectionEventId
-var targetEventType;
+var targetEventNodeType;
 
 var x, y;
 //マウスが押された際の関数
@@ -206,17 +204,17 @@ var mdownOnNode = function(e) {
     var event = e.changedTouches[0];
   }
 
-  targetId = $(e.target).parents('.message')[0].dataset.id;
-  for(var i=0; i<scenarioJson.length; i++){
-    if(targetId==scenarioJson[i].id){
-      targetEvent = scenarioJson[i];
+  targetId = $(e.target).parents('.node')[0].dataset.id;
+  for(var i=0; i<scenarioArray.length; i++){
+    if(targetId==scenarioArray[i].id){
+      targetEvent = scenarioArray[i];
       break;
     }
   }
-  targetEventType = targetEvent.type;
+  targetEventNodeType = targetEvent.nodeType;
 
   /*
-  if(targetEventType=='selection'){
+  if(targetEventNodeType=='selection'){
     targetSelectionEventId = e.target.dataset.selectionid;
   }
   */
@@ -232,6 +230,10 @@ var mdownOnNode = function(e) {
   //ムーブイベントにコールバック
   document.body.addEventListener("mousemove", mmoveOnNode, false);
   document.body.addEventListener("touchmove", mmoveOnNode, false);
+
+  // マウスボタンが離されたとき、またはカーソルが外れたとき発火
+  document.body.addEventListener("mouseup", mupOnNode, false);
+  document.body.addEventListener("touchleave", mupOnNode, false);
 
 }
 
@@ -277,7 +279,7 @@ var mmoveOnNode = function(e) {
 
   }
 
-  if(targetEventType=='selection'){
+  if(targetEventNodeType=='group'){
     var selections = targetEvent.selections;
     for(var i=0; i<selections.length; i++){
       if(selections[i].topLineId){
@@ -313,12 +315,7 @@ var mmoveOnNode = function(e) {
     bLine.setAttribute("y2", parseInt(bLine.getAttribute("y2")) + gapY);
   }
 
-  // マウスボタンが離されたとき、またはカーソルが外れたとき発火
-  drag.addEventListener("mouseup", mupOnNode, false);
-  drag.addEventListener("touchend", mupOnNode, false);
-
-  document.body.addEventListener("mouseleave", mupOnNode, false);
-  document.body.addEventListener("touchleave", mupOnNode, false);
+  
 }
 
 //マウスボタンが上がったら発火
@@ -353,8 +350,6 @@ var mupOnNode = function(e) {
 
 
 
-
-
 // 扱っているlineの始点と終点
 var arrowOrigin = {};
 var arrowTo = {};
@@ -374,19 +369,21 @@ var mdownOnLineStart = function(e){
   }
 
   // 操作しているテンプレートに紐づくイベントを取得
-  targetId = $(e.target).parents('.message')[0].dataset.id;
+  targetId = $(e.target).parents('.node')[0].dataset.id;
   
   targetEvent = getEventFromScenarioById(targetId);
-  targetEventType = targetEvent.type;
+  targetEventNodeType = targetEvent.nodeType;
 
-  if(targetEventType=='selection'){
+  if(targetEventNodeType=='group'){
     targetSelectionEventId = e.target.dataset.selectionid;
   }
 
   // lineの始点を取得
   var button = event.target.getBoundingClientRect();
+  // インスペクタの大きさ分を考慮
+  var leftOffset = document.querySelector('inspector').offsetWidth;
   var buttonOffset = 16/2; // 8はボタンの半径
-  arrowOrigin.x = button.left + buttonOffset + canvas.scrollLeft;
+  arrowOrigin.x = button.left + buttonOffset + canvas.scrollLeft - leftOffset;
   arrowOrigin.y = button.top + buttonOffset + canvas.scrollTop-48;
 
   
@@ -416,7 +413,9 @@ var moveOnLineStart = function(e){
   }
 
   // lineの終点の取得
-  arrowTo.x = e.pageX + canvas.scrollLeft;
+  // インスペクタの大きさ分を考慮
+  var leftOffset = document.querySelector('inspector').offsetWidth;
+  arrowTo.x = e.pageX + canvas.scrollLeft - leftOffset;
   arrowTo.y = e.pageY + canvas.scrollTop - 48;
 
   // プレヴュー用のlineを表示
@@ -445,7 +444,7 @@ var upOnLineStart = function(e){
   topLine.classList.add('unsaved');
 
 
-  if(targetEventType=='normal'){
+  if(targetEventNodeType=='single'){
     // 前に描画したtoplineがあるなら削除してguiプロパティに新しいtopLineを追加
     var preTopLine = document.querySelector(`#${targetEvent.gui.topLineId}`);
     if(preTopLine) preTopLine.parentNode.removeChild(preTopLine);
@@ -453,7 +452,7 @@ var upOnLineStart = function(e){
     topLine.setAttribute('id', 'line-'+targetEvent.id);
     targetEvent.gui.topLineId = 'line-'+targetEvent.id;
 
-  }else if(targetEventType=='selection'){
+  }else if(targetEventNodeType=='group'){
     var selections = targetEvent.selections;
     for(var i=0; i<selections.length; i++){
       if(targetSelectionEventId==selections[i].id){
@@ -487,7 +486,7 @@ var upOnLineStart = function(e){
 
 
     // nextイベントをマウスオーバーしているテンプレートのイベントに紐付け
-    if(targetEventType=='normal'){
+    if(targetEventNodeType=='single'){
 
       targetEvent.next = idOfOverTemplate;
       var from = {x: arrowOrigin.x, y: arrowOrigin.y};
@@ -495,7 +494,7 @@ var upOnLineStart = function(e){
       targetEvent.gui.topLinePosition = {origin: from, to: to};
       targetEvent.topLineId = `line-${targetId}`;
 
-    }else if(targetEventType=='selection'){
+    }else if(targetEventNodeType=='group'){
 
       for(var i=0; i<targetEvent.selections.length; i++){
         if(targetEvent.selections[i].id==targetSelectionEventId){
@@ -512,7 +511,7 @@ var upOnLineStart = function(e){
     
     $('#wrapSaving').fadeIn(400);
     service.db.collection('projects').doc(riot.currentProjectId)
-      .update({'scenario': scenarioJson})
+      .update({'scenario': scenarioArray})
       .then(function(){
         console.log('save');
         $('#wrapSaving').fadeOut(400);
@@ -534,11 +533,31 @@ var upOnLineStart = function(e){
 
 
 
+//--------------------------------------------------------------------------------------
 
 
 
-//----------------------------------------------------------------------------------
+var clickOnNode = function(e){
 
+  targetId = $(e.target).parents('.node')[0].dataset.id;
+  for(var i=0; i<scenarioArray.length; i++){
+    if(targetId==scenarioArray[i].id){
+      targetEvent = scenarioArray[i];
+      break;
+    }
+  }
+  targetEventNodeType = targetEvent.nodeType;
+
+  console.log(targetEvent);
+
+  
+
+}
+
+
+
+
+//---utils-------------------------------------------------------------------------------
 
 
 // scenarioのセーブ
@@ -549,7 +568,7 @@ var saveScenario = function(){
 
   $('#wrapSaving').fadeIn(400);
   service.db.collection('projects').doc(riot.currentProjectId)
-    .update({'scenario': scenarioJson})
+    .update({'scenario': scenarioArray})
     .then(function(){
       $('#wrapSaving').fadeOut(400);
       console.log('save');
@@ -585,9 +604,9 @@ var moutTemplate = function(e){
 // あるidを持つイベントをシナリオから取り出す
 var getEventFromScenarioById = function(id){
   var event;
-  for(var i=0; i<scenarioJson.length; i++){
-    if(scenarioJson[i].id == id){
-      event = scenarioJson[i];
+  for(var i=0; i<scenarioArray.length; i++){
+    if(scenarioArray[i].id == id){
+      event = scenarioArray[i];
       break;
     }
   }
@@ -596,9 +615,9 @@ var getEventFromScenarioById = function(id){
 
 var getEventFromScenarioByNext = function(next){
   var event;
-  for(var i=0; i<scenarioJson.length; i++){
-    if(scenarioJson[i].next == next){
-      event = scenarioJson[i];
+  for(var i=0; i<scenarioArray.length; i++){
+    if(scenarioArray[i].next == next){
+      event = scenarioArray[i];
       break;
     }
   }
@@ -608,14 +627,14 @@ var getEventFromScenarioByNext = function(next){
 
 var getNodeFromScenarioById = function(id){
   var node;
-  for(var i=0; i<scenarioJson.length; i++){
-    if(scenarioJson[i].type == 'normal'){
+  for(var i=0; i<scenarioArray.length; i++){
+    if(scenarioArray[i].nodeType == 'single'){
       
-      if(scenarioJson[i].id == id) node = scenarioJson[i];
+      if(scenarioArray[i].id == id) node = scenarioArray[i];
 
-    }else if(scenarioJson[i].type == 'selection'){
+    }else if(scenarioArray[i].nodeType == 'group'){
 
-      var selections = scenarioJson[i].selections;
+      var selections = scenarioArray[i].selections;
       for(var selection_i=0; selection_i<selections.length; selection_i++){
         if(selections[selection_i].id == id) node = selections[selection_i];
       }
@@ -629,9 +648,9 @@ var getNodeFromScenarioById = function(id){
 var getNormalNodesFromScenarioByNext = function(next){
 
   var resultNodes = [];
-  for(var i=0; i<scenarioJson.length; i++){
-    if(scenarioJson[i].type=='normal' && scenarioJson[i].next == next){
-      resultNodes.push(scenarioJson[i]);
+  for(var i=0; i<scenarioArray.length; i++){
+    if(scenarioArray[i].nodeType=='single' && scenarioArray[i].next == next){
+      resultNodes.push(scenarioArray[i]);
     }
   }
   return resultNodes;
@@ -641,9 +660,9 @@ var getNormalNodesFromScenarioByNext = function(next){
 var getSelectionsFromScenarioByNext = function(next){
 
   var resultSelection = [];
-  for(var i=0; i<scenarioJson.length; i++){
-    if(scenarioJson[i].type=='selection'){
-      var selections = scenarioJson[i].selections;
+  for(var i=0; i<scenarioArray.length; i++){
+    if(scenarioArray[i].nodeType=='group'){
+      var selections = scenarioArray[i].selections;
       for(var selection_i=0; selection_i<selections.length; selection_i++){
         if(selections[selection_i].next==next){
           resultSelection.push(selections[selection_i]);

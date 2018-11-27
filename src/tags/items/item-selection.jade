@@ -1,4 +1,4 @@
-item-selection(onmouseover='{over}' onmouseout='{out}' data-id='{id}').message
+item-selection(onclick='{click}' onmouseover='{over}' onmouseout='{out}' data-id='{id}').node
   div.wrap-item.px8.py8
     p.question-text.mb8 {questionText}
     div.wrap-selections
@@ -86,6 +86,7 @@ item-selection(onmouseover='{over}' onmouseout='{out}' data-id='{id}').message
 
     this.down = mdownOnLineStart;
 
+    this.click = clickOnNode;
     this.over = moverTemplate;
     this.out = moutTemplate;
 

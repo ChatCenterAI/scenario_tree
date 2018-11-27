@@ -50,12 +50,13 @@ item-pop-after-drag
       var to = {x: arrowTo.x, y: arrowTo.y};
 
       // この時のターゲットはsimpleMessageそのものではない。
-      if(targetEvent.type=='normal'){
+      if(targetEvent.nodeType=='single'){
         targetEvent.gui.topLinePosition = {origin: from, to: to};
-      }else if(targetEvent.type=='selection'){
+      }else if(targetEvent.nodeType=='group'){
         targetEvent.topLinePosition = {origin: from, to: to};
       }
-      
+
+
 
       /*
       var event = getEventFromScenarioById(targetEvent.id);
@@ -72,10 +73,11 @@ item-pop-after-drag
 
       // contentを作成
       var content = {
-        id: 'simple-tmp' + scenarioJson.length,
-        num: scenarioJson.length,
+        id: 'simple-tmp' + scenarioArray.length,
+        num: scenarioArray.length,
         type: 'normal',
-        text: 'This is My Message: '+scenarioJson.length,
+        nodeType: 'single',
+        text: 'This is My Message: '+scenarioArray.length,
         gui: {
           position: {},
         },
@@ -92,7 +94,7 @@ item-pop-after-drag
       var pop = document.querySelector('item-pop-after-drag');
       pop.classList.remove('show-pop');
 
-      console.log('after adding', scenarioJson);
+      console.log('after adding', scenarioArray);
     }
 
     this.addQuestion = function(){
@@ -107,8 +109,9 @@ item-pop-after-drag
       var idRand = Math.floor(Math.random()*10000);
       var content = {
         id: 'selection-tmp' + idRand,
-        num: scenarioJson.length,
+        num: scenarioArray.length,
         type: 'selection',
+        nodeType: 'group',
         text: 'How are you?: '+idRand,
         selections: [
           {label: 'I am so fine', id: 'selection' + Math.floor(Math.random()*10000)},
