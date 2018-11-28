@@ -1,7 +1,7 @@
 item-conversation-input-selection
-  div.wrap-item.px8.py6.f.flex-wrap
+  div.wrap-item.px8.my6.f.flex-wrap
     div(each='{item in selections}').wrap-selection-bubble.mr6.mb6
-      p(data-next='{item.next}' onclick='{clickBubble}').selection-bubble.px12.pt4.pb6.f.fh {item.label}
+      p(data-next='{item.next}' onclick='{clickBubble}').selection-bubble.px12.py8.f.fh {item.label}
 
   style(scoped, type='less').
     :scope {
@@ -10,12 +10,16 @@ item-conversation-input-selection
         width: 100%;
         max-height: 120px;
         overflow: scroll;
+        transition: all 400ms ease;
         .wrap-selection-bubble {
+          display: none;
           .selection-bubble {
-            background: #1976d2;
+            background: #2196F3;
             color: #fff;
             border-radius: 3px;
             font-weight: lighter;
+            font-size: 12px;
+            letter-spacing: 0.4px;
             cursor: pointer;
           }
         }
@@ -31,6 +35,9 @@ item-conversation-input-selection
     this.selections = this.content.selections;
 
     this.clickBubble = function(e){
+      // selectionを隠してmodule-conversationを調整
+      $('.wrap-selection-bubble').slideToggle(400, resizeWrapMessages);
+
       var next = e.target.dataset.next;
       var isMine = true;
       addMessageToConversationByEvent({

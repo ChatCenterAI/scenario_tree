@@ -5,14 +5,14 @@ atom-float-action-preview(onclick='{togglePreview}')
 
   style(scoped, type='less').
     :scope {
-      display: none;
+      display: block;
       position: fixed;
       z-index: 12;
       right: 16px;
       bottom: 16px;
       width: 48px;
       height: 48px;
-      background: #1976d2;
+      background: #2196F3;
       border-radius: 50%;
       filter: drop-shadow(2px 1px 1px rgba(0,0,0,0.2));
       cursor: pointer;
@@ -28,11 +28,22 @@ atom-float-action-preview(onclick='{togglePreview}')
   script.
 
     var self = this;
-    this.scenarioId = opts.__proto__.id;
+    this.scenarioId = opts.id;
+
+    this.isFirstOpen = true;
 
     this.togglePreview = function(){
       $('atom-float-action-preview').fadeOut(200);
       $('.wrap-conversation-preview').fadeIn(200);
+      
+      // はじめて開いた時にmodule-conversationをマウント
+      if(self.isFirstOpen){
+        riot.mount('wrapper-module-conversation', 'module-conversation', {
+          id: self.scenarioId
+        });
+        riot.update();
+        self.isFirstOpen = false;
+      }
     }
 
     this.on('mount', function(){

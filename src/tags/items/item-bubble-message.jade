@@ -1,5 +1,5 @@
 item-bubble-message
-  div.wrap-item.f.mt12.mb12
+  div.wrap-item.f.mt12.mb12.node-focused
     div.wrap-user-icon
       img(src='{userIcon}')
     div.wrap-bubble
@@ -10,9 +10,10 @@ item-bubble-message
       transform: translateY(24px);
       opacity: 0.0;
       transition: all 400ms ease;
-      .wrap-item {
-        
+      .node-focused {
 
+      }
+      .wrap-item {
         .wrap-user-icon {
           width: 24px;
           height: 24px;
@@ -42,7 +43,7 @@ item-bubble-message
         }
         .wrap-bubble {
           p {
-            background: #1976d2;
+            background: #2196F3;
             color: #FFF;
           }
         }
@@ -70,7 +71,11 @@ item-bubble-message
     });
 
     this.on('updated', function(){
-      this.root.classList.add('active')
+      this.root.classList.add('active');
+
+      // 最下部にスクロール
+      var wrapMessages = document.getElementById('wrapMessages');
+      wrapMessages.scrollTop = wrapMessages.scrollHeight;
     });
 
 

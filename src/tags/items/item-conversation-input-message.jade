@@ -1,7 +1,7 @@
 item-conversation-input-message
   div.wrap-item.f.fm.flex-between.px8
     textarea(placeholder='Message')#conversationMessageInput.pt2.pb3.px5.mr8
-    div.wrap-send.f.fh
+    div(onclick='{send}').wrap-send.f.fh
       img(src='./img/icon/send.svg')
 
 
@@ -25,7 +25,7 @@ item-conversation-input-message
           height: 100%;
           img {
             cursor: pointer;
-            width: 24px;
+            width: 20px;
           }
         }
       }
@@ -33,3 +33,18 @@ item-conversation-input-message
 
 
   script.
+
+    var self = this;
+
+    this.send = function(){
+      var textarea = document.getElementById('conversationMessageInput');
+      var text = textarea.value;
+
+      if(text=='') return;
+
+      var isMine = true;
+      addMessageToConversationByEvent({
+        text: text,
+      }, isMine);
+      textarea.value = '';
+    }

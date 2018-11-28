@@ -5,10 +5,13 @@ page-canvas
   div.wrap-preview
     div.wrap-conversation-preview
       div.preview-header.f.fm.flex-right
+        div(onclick='{reloadPreview}').close-icon.f.fm.mr6
+          img(src='./img/icon/reload.svg')
         div(onclick='{togglePreview}').close-icon.f.fm.mr6
           img(src='./img/icon/close.svg')
-      module-conversation(id='{scenarioId}')
-    atom-float-action-preview
+      wrapper-module-conversation
+      //module-conversation(id='{scenarioId}')
+    atom-float-action-preview(id='{scenarioId}')
 
 
   style(scoped, type='less').
@@ -30,7 +33,7 @@ page-canvas
 
       .wrap-preview {
         .wrap-conversation-preview {
-          /*display: none;*/
+          display: none;
           position: fixed;
           z-index: 12;
           right: 16px;
@@ -44,7 +47,7 @@ page-canvas
           .preview-header {
             width: 100%;
             height: 26px;
-            background: #1976d2;
+            background: #2196F3;
             .close-icon {
               cursor: pointer;
               width: 18px;
@@ -62,6 +65,10 @@ page-canvas
     this.togglePreview = function(){
       $('atom-float-action-preview').fadeIn(200);
       $('.wrap-conversation-preview').fadeOut(200);
+    }
+
+    this.reloadPreview = function(){
+      initConversation(`first-${self.scenarioId}`);
     }
 
     this.on('mount', function(){

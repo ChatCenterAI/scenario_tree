@@ -12,7 +12,7 @@ item-selection(onclick='{click}' onmouseover='{over}' onmouseout='{out}' data-id
       position: absolute;
       display: inline-block;
       border-radius: 3px;
-      background: #1976d2;
+      background: #2196F3;
       filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));
       width: 180px;
       top: 0;
@@ -26,6 +26,9 @@ item-selection(onclick='{click}' onmouseover='{over}' onmouseout='{out}' data-id
       }
       &.active-over {
         transform: scale(1.05) !important;
+      }
+      &.focused-node {
+        border: solid #FF4081 2px !important;
       }
       .question-text {
         color: #fff;
@@ -49,7 +52,7 @@ item-selection(onclick='{click}' onmouseover='{over}' onmouseout='{out}' data-id
             border-radius: 3px;
             p {
               width: 100%;
-              color: #1976d2;
+              color: #2196F3;
               letter-spacing: 0.6px;
               font-weight: 300;
               text-align: center;
@@ -61,7 +64,7 @@ item-selection(onclick='{click}' onmouseover='{over}' onmouseout='{out}' data-id
               cursor: pointer;
               height: 34px;
               .drag-button {
-                background: #1976d2;
+                background: #2196F3;
                 width: 16px;
                 height: 16px;
                 border-radius: 50%;

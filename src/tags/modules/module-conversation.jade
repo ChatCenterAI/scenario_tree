@@ -1,4 +1,4 @@
-module-conversation
+module-conversation#moduleConversation
   div.wrap-module
     div#wrapMessages.wrap-messages.px12
     div#wrapConversationInput.wrap-input
@@ -15,7 +15,8 @@ module-conversation
           overflow: scroll;
           width: 100%;
           height: calc(~'100% - 36px');
-          scroll-behavior: smooth;     
+          scroll-behavior: smooth;  
+          transition: all 400ms ease;   
         }
         .wrap-input {
           position: absolute;
@@ -31,7 +32,7 @@ module-conversation
   script.
 
     this.id = opts.id;
-    riot.currentScenarioId = this.id;
+    riot.currentScenarioId = this.opts.__proto__.id;
 
     // シナリオがロードされたら初期化
     riot.waitForScenarioLoadedTimer = setInterval(function(){

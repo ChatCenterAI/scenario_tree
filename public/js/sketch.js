@@ -19,10 +19,13 @@ var initCanvas = function(firstEventId){
     if(scenarioArray[i].nodeType == 'single') addSimpleMessage(pos.x, pos.y, event, true);
     if(scenarioArray[i].nodeType == 'group') addSelections(pos.x, pos.y, event, true);
     
-    // はじめのメッセージのところまでスクロール
     if(firstEventId==scenarioArray[i].id){
+      // はじめのメッセージのところまでスクロール
       document.querySelector('module-canvas').scrollLeft = pos.x - 100;
       document.querySelector('module-canvas').scrollTop = pos.y - window.innerHeight/2;
+
+      // firstのイベントにフォーカスさせる
+      focusNode(scenarioArray[i]);
     }
 
   }
@@ -175,7 +178,7 @@ var addLine = function(arrowOrigin, arrowTo, id){
   topLine.setAttribute('y1', arrowOrigin.y);
   topLine.setAttribute('x2', arrowTo.x);
   topLine.setAttribute('y2', arrowTo.y);
-  topLine.setAttribute('stroke', '#1976d2');
+  topLine.setAttribute('stroke', '#2196F3');
   topLine.setAttribute('id', id);
 
   canvasSvg.appendChild(topLine);
@@ -548,28 +551,35 @@ var clickOnNode = function(e){
       break;
     }
   }
-  targetEventType = targetEvent.type;
+  
+  // ノードにフォーカスする
+  focusNode(targetEvent);
 
-  console.log(targetEvent);
+}
 
-  switch(targetEventType){
+
+var focusNode = function(focusedEvent){
+
+  switch(focusedEvent.type){
     case 'normal':
 
-      riot.mount('inspector', 'module-inspector-normal', {content: targetEvent});
+      // インスペクタに表示
+      riot.mount('inspector', 'module-inspector-normal', {content: focusedEvent});
       riot.update();
 
     break;
     case 'selection':
 
-      riot.mount('inspector', 'module-inspector-selection', {content: targetEvent});
+      riot.mount('inspector', 'module-inspector-selection', {content: focusedEvent});
       riot.update();
 
     break;
   }
 
-
+  $('.focused-node').removeClass('focused-node');
+  var node = document.getElementById(focusedEvent.id);
+  node.classList.add('focused-node');
 }
-
 
 
 
@@ -582,11 +592,11 @@ var saveScenario = function(){
   var unsavedLine = document.querySelector('.unsaved');
   if(unsavedLine) unsavedLine.classList.remove('unsaved');
 
-  $('#wrapSaving').fadeIn(400);
+  //$('#wrapSaving').fadeIn(400);
   service.db.collection('projects').doc(riot.currentProjectId)
     .update({'scenario': scenarioArray})
     .then(function(){
-      $('#wrapSaving').fadeOut(400);
+      //$('#wrapSaving').fadeOut(400);
       console.log('save');
     });
 
