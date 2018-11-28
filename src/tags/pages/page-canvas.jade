@@ -2,6 +2,13 @@ page-canvas
   div.wrap-page.f
     inspector
     module-canvas(id='{scenarioId}')
+  div.wrap-preview
+    div.wrap-conversation-preview
+      div.preview-header.f.fm.flex-right
+        div(onclick='{togglePreview}').close-icon.f.fm.mr6
+          img(src='./img/icon/close.svg')
+      module-conversation(id='{scenarioId}')
+    atom-float-action-preview
 
 
   style(scoped, type='less').
@@ -20,12 +27,42 @@ page-canvas
           filter: drop-shadow(2px 1px 1px rgba(0,0,0,0.2));
         }
       }
+
+      .wrap-preview {
+        .wrap-conversation-preview {
+          /*display: none;*/
+          position: fixed;
+          z-index: 12;
+          right: 16px;
+          bottom: 16px;
+          width: 300px;
+          height: 440px;
+          background: #FFF;
+          border-radius: 3px;
+          overflow: hidden;
+          filter: drop-shadow(2px 1px 1px rgba(0,0,0,0.2));
+          .preview-header {
+            width: 100%;
+            height: 26px;
+            background: #1976d2;
+            .close-icon {
+              cursor: pointer;
+              width: 18px;
+            }
+          }
+        }
+      }
     }
 
   script.
 
     var self = this;
     this.scenarioId = opts.__proto__.id;
+
+    this.togglePreview = function(){
+      $('atom-float-action-preview').fadeIn(200);
+      $('.wrap-conversation-preview').fadeOut(200);
+    }
 
     this.on('mount', function(){
 

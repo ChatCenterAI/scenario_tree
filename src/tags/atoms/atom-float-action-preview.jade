@@ -1,0 +1,40 @@
+atom-float-action-preview(onclick='{togglePreview}')
+  div.wrap-atom.f.fh
+    img(src='./img/icon/preview.svg')
+
+
+  style(scoped, type='less').
+    :scope {
+      display: none;
+      position: fixed;
+      z-index: 12;
+      right: 16px;
+      bottom: 16px;
+      width: 48px;
+      height: 48px;
+      background: #1976d2;
+      border-radius: 50%;
+      filter: drop-shadow(2px 1px 1px rgba(0,0,0,0.2));
+      cursor: pointer;
+      .wrap-atom {
+        width: 100%;
+        height: 100%;
+        img {
+          width: 26px;
+        }
+      }
+    }
+
+  script.
+
+    var self = this;
+    this.scenarioId = opts.__proto__.id;
+
+    this.togglePreview = function(){
+      $('atom-float-action-preview').fadeOut(200);
+      $('.wrap-conversation-preview').fadeIn(200);
+    }
+
+    this.on('mount', function(){
+
+    });

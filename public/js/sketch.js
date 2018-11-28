@@ -1,7 +1,7 @@
 
 var canvas, canvasSvg;
 
-var initCanvas = function(firstEventName){
+var initCanvas = function(firstEventId){
 
   canvas = document.querySelector('module-canvas');
   canvasSvg = document.querySelector('#canvasSvg');
@@ -20,7 +20,7 @@ var initCanvas = function(firstEventName){
     if(scenarioArray[i].nodeType == 'group') addSelections(pos.x, pos.y, event, true);
     
     // はじめのメッセージのところまでスクロール
-    if(firstEventName==scenarioArray[i].id){
+    if(firstEventId==scenarioArray[i].id){
       document.querySelector('module-canvas').scrollLeft = pos.x - 100;
       document.querySelector('module-canvas').scrollTop = pos.y - window.innerHeight/2;
     }

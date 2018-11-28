@@ -1,0 +1,43 @@
+module-conversation
+  div.wrap-module
+    div#wrapMessages.wrap-messages.px12
+    div#wrapConversationInput.wrap-input
+      item-conversation-input-message
+      conversation-input-selection
+        //item-conversation-input-selection
+
+  style(scoped, type='less').
+    :scope {
+      .wrap-module {
+        position: relative;
+        height: calc(~'100% - 24px');
+        .wrap-messages {
+          overflow: scroll;
+          width: 100%;
+          height: calc(~'100% - 36px');
+          scroll-behavior: smooth;     
+        }
+        .wrap-input {
+          position: absolute;
+          left: 0;
+          bottom: 0;
+          z-index: 15;
+          width: 100%;
+          background: #fff;
+        }
+      }
+    }
+
+  script.
+
+    this.id = opts.id;
+    riot.currentScenarioId = this.id;
+
+    // シナリオがロードされたら初期化
+    riot.waitForScenarioLoadedTimer = setInterval(function(){
+      if(scenarioArray){
+        var firstEventName = `first-${riot.currentScenarioId}`;
+        initConversation(firstEventName);
+        clearInterval(riot.waitForScenarioLoadedTimer);
+      }
+    }, 800);
