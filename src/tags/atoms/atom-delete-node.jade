@@ -1,0 +1,102 @@
+atom-delete-node
+  div(onclick='{deleteNode}').wrap-atom.f.fh
+    //img(src='./img/icon/delete.svg')
+    p Delete
+
+  style(scoped, type='less').
+    :scope {
+      /*
+      width: 20px;
+      height: 20px;
+      .wrap-atom {
+        width: 100%;
+        height: 100%;
+        img {
+          width: 20px;
+          height: 20px;
+        }
+      }
+      */
+      .wrap-atom {
+        p {
+          font-size: 12px;
+          font-weight: 500;
+          color: #FF4081;
+          border-bottom: solid #FF4081 0.5px;
+        }
+      }
+    }
+
+
+  script.
+
+    var self = this;
+    this.id = opts.id;
+    this.deleteNode = function(e) {
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      // singleとgroupそれぞれに対して、nextを持つ全てのnodeのデータを消去して、GUIから要素を消去
+      var preIndexesOfNomalNodes = getIndexesOfNormalNodesFromScenarioByNext(this.id);
+      for(var i=0; i<preIndexesOfNomalNodes.length; i++){
+        var index = preIndexesOfNomalNodes[i];
+
+        var lineName = `line-${scenarioArray[index.scenarioIndex].id}`;
+        var line = document.getElementById(lineName);
+        line.parentNode.removeChild(line);
+
+        delete scenarioArray[index.scenarioIndex].next;
+        delete scenarioArray[index.scenarioIndex].gui.topLineId;
+        delete scenarioArray[index.scenarioIndex].gui.topLinePosition;
+      }
+
+      var preIndexesOfSelectionNodes = getIndexesOfSelectionsFromScenarioByNext(this.id);
+      for(var i=0; i<preIndexesOfSelectionNodes.length; i++){
+        var index = preIndexesOfSelectionNodes[i];
+
+        var lineName = `line-${scenarioArray[index.scenarioIndex].selections[index.selectionIndex].id}`;
+        var line = document.getElementById(lineName);
+        line.parentNode.removeChild(line);
+
+        delete scenarioArray[index.scenarioIndex].selections[index.selectionIndex].next;
+        delete scenarioArray[index.scenarioIndex].selections[index.selectionIndex].topLineId;
+        delete scenarioArray[index.scenarioIndex].selections[index.selectionIndex].topLinePosition;
+      }
+
+
+      // 自身のイベントデータと要素を消去
+      var selfNode = getEventFromScenarioById(self.id);
+
+      if(selfNode.nodeType=='single'){
+
+        var lineName = `line-${selfNode.id}`;
+        var line = document.getElementById(lineName);
+        line.parentNode.removeChild(line);
+
+      }else if(selfNode.nodeType=='group'){
+
+        var selections = selfNode.selections;
+        for(var i=0; i<selections.length; i++){
+          var lineName = `line-${selections[i].id}`;
+          var line = document.getElementById(lineName);
+          if(line) line.parentNode.removeChild(line);
+        }
+
+      }
+
+      var node = document.getElementById(selfNode.id);
+      node.parentNode.removeChild(node);
+
+      var selfNodeIndex;
+      for(var i=0; i<scenarioArray.length; i++){
+        if(selfNode.id==scenarioArray[i].id) selfNodeIndex = i
+      }
+      scenarioArray.splice(selfNodeIndex, 1);
+
+
+      saveScenario();
+    } // deleteNode
+
+
+

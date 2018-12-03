@@ -122,7 +122,7 @@ var addSelections = function(x, y, content, isLoading){
   // 前のイベントと関連づけする
   if(!(isLoading) && targetEvent) targetEvent.next = content.id;
 
-  if(!(isLoading) && targetEvent && targetEvent.nodeType=='selection'){
+  if(!(isLoading) && targetEvent && targetEvent.nodeType=='group'){
     
     var selections = targetEvent.selections;
     for(var i=0; i<selections.length; i++){
@@ -407,6 +407,7 @@ var mdownOnLineStart = function(e){
 
 
   document.body.addEventListener("mousemove", moveOnLineStart, false);
+  document.body.addEventListener("touchmove", moveOnLineStart, false);
 }
 
 var moveOnLineStart = function(e){
@@ -434,6 +435,7 @@ var moveOnLineStart = function(e){
 
 
   document.body.addEventListener("mouseup", upOnLineStart, false);
+  document.body.addEventListener("touchleave", upOnLineStart, false);
 }
 
 var upOnLineStart = function(e){
@@ -513,14 +515,7 @@ var upOnLineStart = function(e){
 
     }
 
-    
-    $('#wrapSaving').fadeIn(400);
-    service.db.collection('projects').doc(riot.currentProjectId)
-      .update({'scenario': scenarioArray})
-      .then(function(){
-        console.log('save');
-        $('#wrapSaving').fadeOut(400);
-      });
+    saveScenario();
 
   }else{
     // 終点にポップを出す
@@ -533,12 +528,33 @@ var upOnLineStart = function(e){
 
   document.body.removeEventListener("mousemove", moveOnLineStart, false);
   document.body.removeEventListener("mouseup", upOnLineStart, false);
+  document.body.removeEventListener("touchmove", upOnLineStart, false);
+}
+
+
+
+
+
+//--------------------------------------------------------------------------------------
+
+document.onkeydown = keydown;
+
+function keydown(e) {
+  
+  if (event.ctrlKey == true) {
+    console.log(event);
+  }
+  
 }
 
 
 
 
 //--------------------------------------------------------------------------------------
+
+
+
+
 
 
 
@@ -670,7 +686,7 @@ var getNodeFromScenarioById = function(id){
   return node;
 }
 
-
+// nextからnodeを取得
 var getNormalNodesFromScenarioByNext = function(next){
 
   var resultNodes = [];
@@ -702,4 +718,32 @@ var getSelectionsFromScenarioByNext = function(next){
 
 
 
+// nextからscenarioArrayのindexを取得
+var getIndexesOfNormalNodesFromScenarioByNext = function(next){
 
+  var resultIndexs = [];
+  for(var i=0; i<scenarioArray.length; i++){
+    if(scenarioArray[i].nodeType=='single' && scenarioArray[i].next == next){
+      resultIndexs.push({scenarioIndex: i});
+    }
+  }
+  return resultIndexs;
+
+}
+
+var getIndexesOfSelectionsFromScenarioByNext = function(next){
+
+  var resultIndexs = [];
+  for(var i=0; i<scenarioArray.length; i++){
+    if(scenarioArray[i].nodeType=='group'){
+      var selections = scenarioArray[i].selections;
+      for(var selection_i=0; selection_i<selections.length; selection_i++){
+        if(selections[selection_i].next==next){
+          resultIndexs.push({scenarioIndex: i, selectionIndex: selection_i});
+        }
+      }
+    }
+  }
+
+  return resultIndexs;
+}

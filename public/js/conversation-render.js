@@ -31,7 +31,7 @@ var fireEventOfConversation = function(eventId){
         var nextId = event.next;
         fireEventOfConversation(nextId);
 
-        focusNode(event);
+        if(location.hash.indexOf('#project') >= 0) focusNode(event);
       })();
 
     break;
@@ -48,7 +48,8 @@ var fireEventOfConversation = function(eventId){
         
         // selectionを出してmodule-conversationを調整
         $('.wrap-selection-bubble').slideToggle(400, resizeWrapMessages);
-        focusNode(event);
+        
+        if(location.hash.indexOf('#project') >= 0) focusNode(event);
       })();
       
     break;

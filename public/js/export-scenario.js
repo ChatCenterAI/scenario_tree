@@ -69,7 +69,7 @@ var convertScenarioArrayToCsv = function(){
   // はじめのautomationからselectionを表示するまでを先に入れる
   var firstEventId = `first-${riot.currentProjectId}`;
   var firstEvent = getEventFromScenarioById(firstEventId);
-  var firstAutomationActionNum = 0;
+  var firstAutomationActionNum = 1;
   resultToExportArray.push([`auto-${firstEventId}`,'automation','event','Dialog.open','name',`Automation ${firstEventId}`,'','']);
   resultToExportArray.push([`auto-${firstEventId}.case1`,'automation_case','','','','','','']);
   resultToExportArray.push([`auto-${firstEventId}.case1.action${firstAutomationActionNum}`,'automation_action','type','send_message','template', firstEventId,'','']);
@@ -87,7 +87,7 @@ var convertScenarioArrayToCsv = function(){
 
     // nextがあってかつnormalな場合、次のeventをactionをautomationに足す
     var nextEvent = getEventFromScenarioById(nextId);
-    resultToExportArray.push([`auto-${firstEventId}.case1.action${firstAutomationActionNum}`,'automation_action','type','send_message','template', nextEvent.id,'','']);
+    resultToExportArray.push([`auto-${firstEventId}.case1.action${firstAutomationActionNum}`,'automation_action','type','send_message','template', nextEvent.id,'op','then']);
     firstAutomationActionNum++;
 
     // nextEventを更新してもう一周
@@ -129,7 +129,7 @@ var convertScenarioArrayToCsv = function(){
           if(nextNode.type=='selection' || !nextNode.next) break;
 
           // ノードがnormalで、かつnextもある場合、actionを足す
-          resultToExportArray.push([`auto-${rootNodeId}.case1.action${automationNum}`,'automation_action','type','send_message','template',nextNode.next,'','']);
+          resultToExportArray.push([`auto-${rootNodeId}.case1.action${automationNum}`,'automation_action','type','send_message','template',nextNode.next,'op','then']);
           automationNum++;
 
           currentNode = nextNode;

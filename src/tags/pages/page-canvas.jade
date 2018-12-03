@@ -4,11 +4,15 @@ page-canvas
     module-canvas(id='{scenarioId}')
   div.wrap-preview
     div.wrap-conversation-preview
+      a(style='opacity: 0; position: fixed; z-index: -1;').js-copytext {urlToCopy}
       div.preview-header.f.fm.flex-right
-        div(onclick='{reloadPreview}').close-icon.f.fm.mr6
+        div(onclick='{copy.bind(this, urlToCopy)}').icon.f.fm.mr6
+          img(src='./img/icon/share.svg')
+        div(onclick='{reloadPreview}').icon.f.fm.mr6
           img(src='./img/icon/reload.svg')
-        div(onclick='{togglePreview}').close-icon.f.fm.mr6
+        div(onclick='{togglePreview}').icon.f.fm.mr6
           img(src='./img/icon/close.svg')
+
       wrapper-module-conversation
       //module-conversation(id='{scenarioId}')
     atom-float-action-preview(id='{scenarioId}')
@@ -48,7 +52,7 @@ page-canvas
             width: 100%;
             height: 26px;
             background: #2196F3;
-            .close-icon {
+            .icon {
               cursor: pointer;
               width: 18px;
             }
@@ -71,6 +75,33 @@ page-canvas
       initConversation(`first-${self.scenarioId}`);
     }
 
+    this.urlToCopy = `${location.host}/#conversation/${this.scenarioId}`;
+
+    /*
+    this.copyLink = function(){
+      self.copy(self.urlToCopy);
+    }
+    */
+
+    this.copy = function(url){
+      console.log('copy this:', url);
+      var element = document.querySelector('.js-copytext');
+      var range = document.createRange();
+      range.selectNode(element);
+
+      var selection = getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+
+      document.execCommand('copy');
+
+      selection.removeAllRanges();
+
+      alert('コピーしました。');
+    }
+
+
     this.on('mount', function(){
 
     });
+

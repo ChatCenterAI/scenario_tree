@@ -1,50 +1,79 @@
 item-message(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='{id}' data-id='{id}').node
-  div.wrap-item.f.fm.flex-between
-    p.text.line-clamp-1.pl12.pr8.pt8.pb7 {text}
-    div(onmousedown='{down}').wrap-drag-button.pr8.f.fm
-      div.drag-button
+  div.wrap-node
+    div.wrap-node-content.f.fm.flex-between
+      p.text.line-clamp-1.pl12.pr8.pt8.pb7 {text}
+      div(onmousedown='{down}').wrap-drag-button.pr8.f.fm
+        div.drag-button
+  div.wrap-icon.f.fh
+    atom-delete-node(id='{id}')
+
+
 
   style(scoped, type='less').
     :scope {
       position: absolute;
       display: inline-block;
-      border: solid #2196F3 0.5px;
-      border-radius: 3px;
-      background: #fff;
-      filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));
-      cursor: grab;
-
       transition: transform 0.2s;
-      transform: scale(1);
+
+      .wrap-node {
+        border: solid #2196F3 0.5px;
+        border-radius: 3px;
+        overflow: hidden;
+        cursor: grab;
+        /*filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));*/
+        box-shadow: 1px 1px 4px rgba(0,0,0,0.4);
+
+        transform: scale(1);
+        .wrap-node-content {
+          position: relative;
+          overflow: visible;
+          background: #fff;
+          p {
+            /*white-space: nowrap;*/
+            display: inline-block;
+            color: #2196F3;
+            letter-spacing: 0.6px;
+            font-weight: 300;
+            width: 100%;
+            max-width: 180px;
+          }
+          .wrap-drag-button {
+            cursor: pointer;
+            height: 34px;
+            .drag-button {
+              background: #2196F3;
+              width: 16px;
+              height: 16px;
+              border-radius: 50%;
+            }
+          }
+        }
+
+      } /*wrap-node*/
+
       &.drag {
         cursor: grabbing !important;
       }
       &.active-over {
         transform: scale(1.05) !important;
       }
+
       &.focused-node {
-        border: solid #FF4081 2px !important;
-      }
-      .wrap-item {
-        overflow: visible;
-        p {
-          /*white-space: nowrap;*/
-          display: inline-block;
-          color: #2196F3;
-          letter-spacing: 0.6px;
-          font-weight: 300;
-          width: 100%;
-          max-width: 180px;
+        .wrap-node {
+          border: solid #FF4081 2px !important;
         }
-        .wrap-drag-button {
-          cursor: pointer;
-          height: 34px;
-          .drag-button {
-            background: #2196F3;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-          }
+      }
+
+      .wrap-icon {
+        position: absolute;
+        right: 0px;
+        top: -20px;
+        cursor: pointer;
+        display: none;
+      }
+      &.focused-node {
+        .wrap-icon {
+          display: block;
         }
       }
     }

@@ -1,78 +1,101 @@
 item-selection(onclick='{click}' onmouseover='{over}' onmouseout='{out}' data-id='{id}').node
-  div.wrap-item.px8.py8
-    p.question-text.mb8 {questionText}
-    div.wrap-selections
-      div(each='{item in selections}').wrap-text.f.fm.flex-between.mb8
-        p.pl12.pr8 {item.label}
-        div(onmousedown='{down}').wrap-drag-button.pr8.f.fm
-          div(data-selectionid='{item.id}').drag-button
+  div.wrap-node
+    div.wrap-node-content.px8.py8
+      p.question-text.mb8 {questionText}
+      div.wrap-selections
+        div(each='{item in selections}').wrap-text.f.fm.flex-between.mb8
+          p.pl12.pr8 {item.label}
+          div(onmousedown='{down}').wrap-drag-button.pr8.f.fm
+            div(data-selectionid='{item.id}').drag-button
+  div.wrap-icon.f.fh
+    atom-delete-node(id='{id}')
+
+
 
   style(scoped, type='less').
     :scope {
       position: absolute;
       display: inline-block;
-      border-radius: 3px;
-      background: #2196F3;
-      filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));
       width: 180px;
-      top: 0;
-      left: 0;
       cursor: grab;
 
       transition: transform 0.2s;
       transform: scale(1);
+
+      .wrap-node {
+        box-shadow: 1px 1px 4px rgba(0,0,0,0.4);
+        overflow: hidden;
+        border-radius: 3px;
+        background: #2196F3;
+        .wrap-node-content {
+          overflow: visible;
+          .question-text {
+            color: #fff;
+            text-align: center;
+            font-weight: 300;
+            letter-spacing: 0.6px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+          .wrap-selections {
+            display: inline-block;
+            border-radius: 3px;
+            width: 100%;
+            .wrap-text {
+              filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));
+              background: #fff;
+              border-radius: 3px;
+              p {
+                width: 100%;
+                color: #2196F3;
+                letter-spacing: 0.6px;
+                font-weight: 300;
+                text-align: center;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+              }
+              .wrap-drag-button {
+                cursor: pointer;
+                height: 34px;
+                .drag-button {
+                  background: #2196F3;
+                  width: 16px;
+                  height: 16px;
+                  border-radius: 50%;
+                }
+              }
+            }
+          }
+        }
+      } /* .wrap-node */
+
       &.drag {
         cursor: grabbing !important;
       }
       &.active-over {
         transform: scale(1.05) !important;
       }
+
       &.focused-node {
-        border: solid #FF4081 2px !important;
-      }
-      .question-text {
-        color: #fff;
-        text-align: center;
-        font-weight: 300;
-        letter-spacing: 0.6px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        .wrap-node {
+          border: solid #FF4081 2px !important;
+        }
       }
 
-      .wrap-item {
-        overflow: visible;
-        .wrap-selections {
-          display: inline-block;
-          border-radius: 3px;
-          width: 100%;
-          .wrap-text {
-            filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));
-            background: #fff;
-            border-radius: 3px;
-            p {
-              width: 100%;
-              color: #2196F3;
-              letter-spacing: 0.6px;
-              font-weight: 300;
-              text-align: center;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              white-space: nowrap;
-            }
-            .wrap-drag-button {
-              cursor: pointer;
-              height: 34px;
-              .drag-button {
-                background: #2196F3;
-                width: 16px;
-                height: 16px;
-                border-radius: 50%;
-              }
-            }
-          }
+      .wrap-icon {
+        position: absolute;
+        right: 0px;
+        top: -20px;
+        cursor: pointer;
+        display: none;
+      }
+      &.focused-node {
+        .wrap-icon {
+          display: block;
         }
-      } /* .wrap-item */
+      }
 
     }
 

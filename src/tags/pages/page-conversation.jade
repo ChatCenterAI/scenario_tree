@@ -1,0 +1,60 @@
+page-conversation
+  div.wrap-page
+    wrapper-module-conversation
+
+
+  style(scoped, type='less').
+    :scope {
+      .wrap-page {
+        width: 100%;
+        height: 100%;
+        background: #fff;
+        position: relative;
+      }
+    }
+
+  script.
+
+
+    riot.currentProjectId = opts.__proto__.id;
+
+    this.loadScenario = async ()=>{
+    
+      self.project = await service.db.collection("projects")
+        .doc(opts.id)
+        .get()
+        .then(function(doc) {
+          var data = doc.data()
+          data.id = doc.id;
+          return data;
+        })
+        .catch(function(error) {
+          console.error("Error writing document: ", error);
+        });
+
+      var firstEventName = `first-${self.project.id}`;
+
+      scenarioArray = self.project.scenario;
+
+      $('#loading').fadeOut(400);
+    }
+
+
+    var tryLoad = function(loadScenario){
+      if(session.user){
+        clearInterval(riot.loadScenarioTimer);
+        loadScenario();
+      }
+    }
+
+    $('#loading').fadeIn(400);
+    riot.loadScenarioTimer = setInterval(tryLoad.bind(undefined, this.loadScenario), 800);
+
+    this.on('mount', function(){
+      // pageのマウントができたらconversationをマウント
+      riot.mount('wrapper-module-conversation', 'module-conversation', {
+        id: riot.currentProjectId
+      });
+      riot.update();
+      self.isFirstOpen = false;
+    });

@@ -16,6 +16,23 @@ riot.route('/projects/*', function(tagName) {
 })
 
 
+riot.route('/conversation/*', function(tagName) {
+  if(riot.enableFadeIn) $('content').removeClass('not-opacity');
+
+  riot.enableFadeIn = true;
+
+  $(document).trigger("custom:close");
+
+  var projectId = tagName;
+  setTimeout(function() {
+    $('content').addClass('not-opacity');
+    riot.mount('header', 'util-header');
+    riot.mount('content', 'page-conversation', {id: projectId});
+    riot.update();
+  }, 400);
+})
+
+
 riot.route('/top', function(tagName) {
 
   if(riot.enableFadeIn) $('content').removeClass('not-opacity');
