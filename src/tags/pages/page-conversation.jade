@@ -42,7 +42,22 @@ page-conversation
 
       var firstEventName = `first-${self.project.id}`;
 
-      scenarioArray = self.project.scenario;
+      //scenarioArray = self.project.scenario;
+
+      var scenario = await service.db.collection("projects")
+        .doc(opts.id)
+        .collection('scenario')
+        .get()
+        .then(function(doc) {
+          var resultScenario = [];     
+          for(var i=0; i<doc.docs.length; i++){
+            //var data = doc.docs[i].data();
+            resultScenario.push(doc.docs[i].data());
+          }
+          return resultScenario;
+        });
+
+      scenarioArray = scenario;
 
       $('#loading').fadeOut(400);
     }
