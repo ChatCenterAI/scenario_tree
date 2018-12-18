@@ -42,7 +42,16 @@ firebase.auth().getRedirectResult().then(function(result) {
 
 // ページが読み込まれた時など、認証状態の変化時のステータス管理
 firebase.auth().onAuthStateChanged(function(user) {
-  if (user) {
+
+  // チャットの独自URLじゃないかどうか
+  var isConversationPage = false;
+  var hash = window.location.hash;
+  if(hash.indexOf('#conversation')>=0){
+    isConversationPage = true;
+    console.log('is conversation url');
+  }
+
+  if (user && !(isConversationPage)) {
     // User is signed in.
     console.log('under sign in', user, {status: 'normal'});
     
@@ -52,7 +61,7 @@ firebase.auth().onAuthStateChanged(function(user) {
 
     $('header').show();
     $('.wrap-content').removeClass('full-height');
-  } else {
+  } else if(!(isConversationPage)) {
     // No user is signed in.
     console.log('under sign out');
     window.location.href = '/#login';

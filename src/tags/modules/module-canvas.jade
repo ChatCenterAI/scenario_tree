@@ -1,7 +1,10 @@
 module-canvas#canvas
   svg#canvasSvg
     line#lineForPreview
-  item-pop-after-drag(id='{opts.id}')
+  div#canvasNodes
+  wrap-pop-after-drag
+    item-pop-after-drag
+  div#canvasOverlay
   //item-selection
 
   style(scoped, type='less').
@@ -34,6 +37,32 @@ module-canvas#canvas
           display: block !important;
         }
       }
+      #canvasNodes {
+        position: absolute;
+        width: 100000px;
+        height: 100000px;
+        top: 0;
+        left: 0;
+      }
+      .add-node-z {
+        z-index: 13;
+        item-message {
+          cursor: pointer !important;
+        }
+        item-selection {
+          cursor: pointer !important;
+        }
+      }
+      #canvasOverlay {
+        display: none;
+        position: absolute;
+        width: 100000px;
+        height: 100000px;
+        top: 0;
+        left: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 12;
+      }
     }
 
   script.
@@ -62,10 +91,56 @@ module-canvas#canvas
 
       var firstEventName = `first-${self.project.id}`;
 
-      scenarioArray = self.project.scenario;
+      riot.currentProject = self.project;
+
+      var scenario = await service.db.collection("projects")
+        .doc(opts.id)
+        .collection('scenario')
+        .get()
+        .then(function(doc) {
+          var resultScenario = [];     
+          for(var i=0; i<doc.docs.length; i++){
+            //var data = doc.docs[i].data();
+            resultScenario.push(doc.docs[i].data());
+          }
+          return resultScenario;
+        });
+
+      
+      
+      scenarioArray = scenario;
+      //scenarioArray = self.project.scenario;
       initCanvas(firstEventName);
 
       $('#loading').fadeOut(400);
+
+      /*  
+      var william = await service.db.collection("projects")
+        .doc('LC9c4DBFpbGS3FayhtxQ')
+        .get()
+        .then(function(doc) {
+          var data = doc.data()
+          data.id = doc.id;
+          return data;
+        })
+        .catch(function(error) {
+          console.error("Error writing document: ", error);
+        });
+      debugger
+
+      for(var i=0; i<william.scenario.length; i++){
+        var obj = william.scenario[i];
+        obj.author = 'VSiXUT65zwWBz3SYKqtyIsR7jm73';
+        await service.db.collection("projects")
+          .doc('LC9c4DBFpbGS3FayhtxQ')
+          .collection('scenario')
+          .doc(obj.id)
+          .set(obj);
+      }
+      */
+      
+
+
     }
 
     $('#loading').fadeIn(400);

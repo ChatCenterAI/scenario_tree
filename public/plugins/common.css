@@ -1,5 +1,12 @@
 /*@import url('https://fonts.googleapis.com/earlyaccess/notosansjapanese.css');*/
 
+html {
+  overflow: hidden;
+}
+
+body {
+  overflow: hidden;
+}
 
 h1 {
   font-family: "Yu Gothic", Noto Sans Japanese, Noto Sans JP , helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
@@ -28,6 +35,17 @@ li {
 
 a {
   font-family: "Yu Gothic", Noto Sans Japanese, Noto Sans JP , helvetica, arial, 'hiragino kaku gothic pro', meiryo, 'ms pgothic', sans-serif;
+}
+
+textarea {
+  font-family: Avenir,"Open Sans","Helvetica Neue",Helvetica,Arial,Verdana,Roboto,"游ゴシック","Yu Gothic","游ゴシック体","YuGothic","ヒラギノ角ゴ Pro W3","Hiragino Kaku Gothic Pro","Meiryo UI","メイリオ",Meiryo,"ＭＳ Ｐゴシック","MS PGothic",sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+:placeholder-shown {
+  font-family: Avenir,"Open Sans","Helvetica Neue",Helvetica,Arial,Verdana,Roboto,"游ゴシック","Yu Gothic","游ゴシック体","YuGothic","ヒラギノ角ゴ Pro W3","Hiragino Kaku Gothic Pro","Meiryo UI","メイリオ",Meiryo,"ＭＳ Ｐゴシック","MS PGothic",sans-serif;
+  -webkit-font-smoothing: antialiased;
+  font-size: 14px;
 }
 
 

@@ -1,5 +1,5 @@
 module-conversation#moduleConversation
-  div.wrap-module
+  div.wrap-module#conversationModule
     div#wrapMessages.wrap-messages.px12
     div#wrapConversationInput.wrap-input
       item-conversation-input-message
@@ -10,11 +10,13 @@ module-conversation#moduleConversation
     :scope {
       .wrap-module {
         position: relative;
-        height: calc(~'100% - 24px');
+        height: calc(~'100vh - 84px');
+        /*height: calc(~'100vh - 180px');*/
         .wrap-messages {
           overflow: scroll;
           width: 100%;
-          height: calc(~'100% - 36px');
+          /*height: calc(~'100% - 36px');*/
+          height: 100%;
           scroll-behavior: smooth;  
           transition: all 400ms ease;   
         }
@@ -27,9 +29,19 @@ module-conversation#moduleConversation
           background: #fff;
         }
       }
+
+      .project-view {
+        height: calc(~'100% - 24px');
+      }
+
+      .mini-view {
+        height: calc(~'100vh - 180px') !important;
+      }
     }
 
   script.
+
+    var self = this;
 
     this.id = opts.id;
     riot.currentScenarioId = this.opts.__proto__.id;
@@ -42,3 +54,26 @@ module-conversation#moduleConversation
         clearInterval(riot.waitForScenarioLoadedTimer);
       }
     }, 800);
+
+
+
+    this.on('mount', function(){
+
+      /*
+      if(_uac.browser=='safari' && (_uac.device=='iphone' || _uac.device=='ipad')){
+        $('#conversationModule').addClass('mini-view');
+      }
+      */
+
+      var hash = window.location.hash;
+      if(hash.lastIndexOf('#project') != -1){
+        $('#conversationModule').addClass('project-view');
+      }
+
+      if(platform.name == 'Safari' && (platform.product=='iPhone' ||  platform.product=='iPad')){
+        $('#conversationModule').addClass('mini-view');
+      }
+
+
+
+    });

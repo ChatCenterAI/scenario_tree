@@ -128,9 +128,19 @@ var convertScenarioArrayToCsv = function(){
           // 次のノードがselectionだったら抜ける
           if(nextNode.type=='selection' || !nextNode.next) break;
 
+          debugger
+          // 次のノードがgotoNodeなら
+          if(nextNode.type=='goto'){
+            debugger
+            // gotoのexportやっているところ
+            nextNode = getEventFromScenarioById(nextNode.toId);
+          }
+
           // ノードがnormalで、かつnextもある場合、actionを足す
-          resultToExportArray.push([`auto-${rootNodeId}.case1.action${automationNum}`,'automation_action','type','send_message','template',nextNode.next,'op','then']);
-          automationNum++;
+          if(nextNode.type=='normal'){
+            resultToExportArray.push([`auto-${rootNodeId}.case1.action${automationNum}`,'automation_action','type','send_message','template',nextNode.next,'op','then']);
+            automationNum++;
+          }
 
           currentNode = nextNode;
         }

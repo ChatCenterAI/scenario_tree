@@ -53,6 +53,33 @@ var fireEventOfConversation = function(eventId){
       })();
       
     break;
+
+    case 'openquestion':
+
+      (async () => {
+        await sleep(1200);
+        var isMine = false;
+        addMessageToConversationByEvent(event, isMine);
+        
+        var sendIcon = document.getElementById('conversationSendIcon');
+        sendIcon.dataset.next = event.next;
+
+        var textarea = document.getElementById('conversationMessageInput');
+        textarea.placeholder = event.expectedAnswer;
+        
+        if(location.hash.indexOf('#project') >= 0) focusNode(event);
+      })();
+
+      if(location.hash.indexOf('#project') >= 0) focusNode(event);
+    break;
+
+    case 'goto':
+
+      var nextId = event.toId;
+      fireEventOfConversation(nextId);      
+
+      if(location.hash.indexOf('#project') >= 0) focusNode(event);
+    break;
   }
 
 }

@@ -15,7 +15,6 @@ page-conversation
 
   script.
 
-
     riot.currentProjectId = opts.__proto__.id;
 
     this.loadScenario = async ()=>{
@@ -32,6 +31,15 @@ page-conversation
           console.error("Error writing document: ", error);
         });
 
+      riot.currentProject = self.project;
+
+      // #conversationの時にlabelを更新
+      var hash = window.location.hash;
+      if(hash.indexOf('#conversation')>=0){
+        riot.mount('header', 'util-header', {status: 'conversation'});
+        riot.update();
+      }
+
       var firstEventName = `first-${self.project.id}`;
 
       scenarioArray = self.project.scenario;
@@ -41,10 +49,10 @@ page-conversation
 
 
     var tryLoad = function(loadScenario){
-      if(session.user){
+      //if(session.user){
         clearInterval(riot.loadScenarioTimer);
         loadScenario();
-      }
+      //}
     }
 
     $('#loading').fadeIn(400);

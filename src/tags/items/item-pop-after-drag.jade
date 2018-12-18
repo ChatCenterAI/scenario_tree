@@ -1,7 +1,16 @@
 item-pop-after-drag
-  div.wrap-item
+  //div.wrap-item
     p(onclick='{addSimple}').px12.pt8.pb7 Simple Message
-    p(onclick='{addQuestion}').px12.pt8.pb7 Ask a Question
+    p(onclick='{addSelection}').px12.pt8.pb7 Selection
+    p(onclick='{addOpenQuestion}').px12.pt8.pb7 Open Question
+    p(onclick='{goTo}').px12.pt8.pb7 Go To
+  div.wrap-item.pop-list
+    p(onclick='{addSimple}').px12.pt8.pb7 Simple Message
+    p(onclick='{showQuestionSelection}').px12.pt8.pb7 Ask a Question
+    p(onclick='{goTo}').px12.pt8.pb7 Go To
+  div.wrap-item.pop-question-list
+    p(onclick='{addSelection}').px12.pt8.pb7 Selection
+    p(onclick='{addOpenQuestion}').px12.pt8.pb7 Open Question
 
   style(scoped, type='less').
     :scope {
@@ -24,16 +33,26 @@ item-pop-after-drag
           font-weight: 300;
           letter-spacing: 0.6px;
           white-space: nowrap;
-        }
-        p:first-child{
           border-bottom: solid rgba(255,255,255,0.5) 0.5px;
         }
+        p:last-child{
+          border-bottom: none;
+        }
+      }
+      .pop-question-list {
+        display: none;
       }
     }
 
   script.
 
     var self = this;
+
+    this.initSelection = [
+      {label: 'Simple Message', func: this.addSimple},
+      {label: 'Ask a Question', func: this.addQuestion},
+      {label: 'Go To', func: this.goTo},
+    ];
 
     this.addSimple = function(){
       
@@ -56,8 +75,6 @@ item-pop-after-drag
         targetEvent.topLinePosition = {origin: from, to: to};
       }
 
-
-
       /*
       var event = getEventFromScenarioById(targetEvent.id);
       if(event.type=='normal'){
@@ -71,33 +88,36 @@ item-pop-after-drag
       //var preEvent = getEventFromScenarioByNext(targetEvent.id);
       //preEvent.gui.topLinePosition = {origin: arrowOrigin, to: arrowTo};
 
+
       // contentを作成
       var content = {
-        id: 'simpleTmp' + scenarioArray.length,
-        num: scenarioArray.length,
+        author: session.user.uid,
+        id: `simpleTmp${riot.currentProject.nodeNum}`,
+        num: riot.currentProject.nodeNum,//scenarioArray.length,
         type: 'normal',
         nodeType: 'single',
-        text: 'This is My Message: '+scenarioArray.length,
+        text: 'This is My Message',
         gui: {
           position: {},
         },
       };
+      riot.currentProject.nodeNum++;
 
       addSimpleMessage(arrowTo.x, arrowTo.y, content, false);
 
 
       // scenarioをupdateする
-      saveScenario();
-
+      //saveScenario();
+      saveScenarioAsSubcollection(content);
 
       // ポップを消去
-      var pop = document.querySelector('item-pop-after-drag');
+      var pop = document.querySelector('wrap-pop-after-drag');
       pop.classList.remove('show-pop');
 
       console.log('after adding', scenarioArray);
     }
 
-    this.addQuestion = function(){
+    this.addSelection = function(){
 
       var from = {x: arrowOrigin.x, y: arrowOrigin.y};
       var to = {x: arrowTo.x, y: arrowTo.y};
@@ -105,14 +125,13 @@ item-pop-after-drag
       var event = getEventFromScenarioById(targetEvent.id);
       event.gui.topLinePosition = {origin: from, to: to};
       
-
-      //var idRand = Math.floor(Math.random()*10000);
       var content = {
-        id: 'selectionTmp' + scenarioArray.length,
-        num: scenarioArray.length,
+        author: session.user.uid,
+        id: `selectionTmp${riot.currentProject.nodeNum}`,
+        num: riot.currentProject.nodeNum,
         type: 'selection',
         nodeType: 'group',
-        text: 'What is your choice?' + scenarioArray.length,//+idRand,
+        text: 'What is your choice?',//+idRand,
         addedSelectionsCounter : 0,
         selections: [
           {label: 'Selection', id: `selectionTmp${scenarioArray.length}-selection0`},
@@ -121,19 +140,95 @@ item-pop-after-drag
           position: {},
         },
       };
+      riot.currentProject.nodeNum++;
 
       addSelections(arrowTo.x, arrowTo.y, content, false);
 
       // ポップを消去
-      var pop = document.querySelector('item-pop-after-drag');
+      var pop = document.querySelector('wrap-pop-after-drag');
       pop.classList.remove('show-pop');
 
 
-      saveScenario();
+      //saveScenario();
+      saveScenarioAsSubcollection(content);
 
     }
 
 
+    this.addOpenQuestion = function(){
+
+      var from = {x: arrowOrigin.x, y: arrowOrigin.y};
+      var to = {x: arrowTo.x, y: arrowTo.y};
+
+      var event = getEventFromScenarioById(targetEvent.id);
+      event.gui.topLinePosition = {origin: from, to: to};
+      
+
+      var content = {
+        author: session.user.uid,
+        id: `openquestionTmp${riot.currentProject.nodeNum}`,
+        num: riot.currentProject.nodeNum,
+        type: 'openquestion',
+        nodeType: 'single',
+        text: 'What is question?',//+idRand,
+        expectedAnswer: 'type your answer...',
+        gui: {
+          position: {},
+        },
+      };
+      riot.currentProject.nodeNum++;
+
+      addOpenQuestion(arrowTo.x, arrowTo.y, content, false);
+
+      // ポップを消去
+      var pop = document.querySelector('wrap-pop-after-drag');
+      pop.classList.remove('show-pop');
+
+      //saveScenario();
+      saveScenarioAsSubcollection(content);
+
+    }
+
+
+    this.goTo = function(){
+
+      // overlayを出してNodeを選択させる
+      $('#canvasOverlay').fadeIn(400);
+      var canvasNodes = document.getElementById('canvasNodes');
+      canvasNodes.classList.add('add-node-z');
+
+
+      var fromEvent = targetEvent;
+      goToFrom = fromEvent;
+
+      if(fromEvent.nodeType == 'single') goToFromId = targetEvent.id;
+      if(fromEvent.nodeType == 'group') goToFromId = targetSelectionEventId;
+
+      // goToNodeを追加
+      underChoiceOfGoTo = true;
+    }
+
+
+    this.showQuestionSelection = function(){
+      var pop = document.querySelector('wrap-pop-after-drag');
+      var preHeight = pop.offsetHeight;
+
+      $('.pop-list').hide();
+      $('.pop-question-list').show();
+
+      var nowHeight = pop.offsetHeight;
+
+
+      var gap = (preHeight-nowHeight)/2;
+      
+      var y = parseInt(pop.style.top) + gap;
+
+      pop.style.top = `${y}px`;
+    }
+
+
+
+    
 
 
 

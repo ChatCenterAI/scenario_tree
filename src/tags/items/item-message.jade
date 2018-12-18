@@ -4,9 +4,10 @@ item-message(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='{id}'
       p.text.line-clamp-1.pl12.pr8.pt8.pb7 {text}
       div(onmousedown='{down}').wrap-drag-button.pr8.f.fm
         div.drag-button
+  div.wrap-num
+    p {num}
   div.wrap-icon.f.fh
     atom-delete-node(id='{id}')
-
 
 
   style(scoped, type='less').
@@ -14,12 +15,13 @@ item-message(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='{id}'
       position: absolute;
       display: inline-block;
       transition: transform 0.2s;
+      cursor: grab;
 
       .wrap-node {
         border: solid #2196F3 0.5px;
         border-radius: 3px;
         overflow: hidden;
-        cursor: grab;
+        
         /*filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));*/
         box-shadow: 1px 1px 4px rgba(0,0,0,0.4);
 
@@ -64,6 +66,17 @@ item-message(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='{id}'
         }
       }
 
+      .wrap-num {
+        position: absolute;
+        left: 4px;
+        top: -20px;
+        p {
+          font-size: 14px;
+          text-align: center;
+          color: #2196F3;
+        }
+      }
+
       .wrap-icon {
         position: absolute;
         right: 0px;
@@ -76,6 +89,21 @@ item-message(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='{id}'
           display: block;
         }
       }
+
+      &.is-go-to-node {
+        .wrap-node {
+          border: none;
+          .wrap-node-content {
+            background: #FF5722;
+            p {
+              color: #fff;
+            }
+            .wrap-drag-button {
+              display: none;
+            }
+          }
+        }
+      }
     }
 
   script.
@@ -83,6 +111,7 @@ item-message(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='{id}'
     var self = this;
     this.id = this.opts.content.id;
     this.text = this.opts.content.text;
+    this.num = this.opts.content.num;
 
     this.down = mdownOnLineStart;
 

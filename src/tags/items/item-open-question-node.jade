@@ -1,10 +1,10 @@
-item-selection(onclick='{click}' onmouseover='{over}' onmouseout='{out}' data-id='{id}').node
+item-open-question-node(onclick='{click}' onmouseover='{over}' onmouseout='{out}' data-id='{id}').node
   div.wrap-node
-    div.wrap-node-content.px8.py8
+    div.wrap-node-content.px8.pt8.pb6
       p.question-text.mb8 {questionText}
       div.wrap-selections
-        div(each='{item in selections}').wrap-text.f.fm.flex-between.mb8
-          p.pl12.pr8 {item.label}
+        div.wrap-text.f.fm.flex-between.mb8
+          p.expected-answer.pl8.pr8 {expectedAnswer}
           div(onmousedown='{down}').wrap-drag-button.pr8.f.fm
             div(data-selectionid='{item.id}').drag-button
   div.wrap-num
@@ -23,15 +23,16 @@ item-selection(onclick='{click}' onmouseover='{over}' onmouseout='{out}' data-id
       transform: scale(1);
 
       .wrap-node {
+        border: solid #2196F3 0.5px;
         box-shadow: 1px 1px 4px rgba(0,0,0,0.4);
         overflow: hidden;
         border-radius: 3px;
         /*background: #2196F3;*/
         background: #fff;
-        border: solid #2196F3 0.5px;
         .wrap-node-content {
           overflow: visible;
           .question-text {
+            /*color: #fff;*/
             color: #2196F3;
             text-align: center;
             font-weight: 300;
@@ -46,12 +47,12 @@ item-selection(onclick='{click}' onmouseover='{over}' onmouseout='{out}' data-id
             width: 100%;
             .wrap-text {
               /*filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));*/
-              border: solid #2196F3 0.5px;
               background: #fff;
+              border: solid #2196F3 0.5px;
               border-radius: 3px;
               p {
                 width: 100%;
-                color: #2196F3;
+                color: #999;
                 letter-spacing: 0.6px;
                 font-weight: 300;
                 text-align: center;
@@ -119,7 +120,8 @@ item-selection(onclick='{click}' onmouseover='{over}' onmouseout='{out}' data-id
 
     this.id = this.opts.content.id; //"selection";
     this.questionText = this.opts.content.text; //'How are you?';
-    this.selections = this.opts.content.selections;
+    //this.selections = this.opts.content.selections;
+    this.expectedAnswer = this.opts.content.expectedAnswer;
     this.num = this.opts.content.num;
 
     /*
@@ -136,7 +138,3 @@ item-selection(onclick='{click}' onmouseover='{over}' onmouseout='{out}' data-id
     this.click = clickOnNode;
     this.over = moverTemplate;
     this.out = moutTemplate;
-
-
-
-

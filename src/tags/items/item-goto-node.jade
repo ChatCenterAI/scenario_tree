@@ -1,0 +1,65 @@
+item-goto-node(onclick='{click}' onmouseover='{over}' onmouseout='{out}' data-id='{id}').node
+  div.wrap-node.f.fh
+    p {linkedNum}
+  div.wrap-icon.f.fh
+    atom-delete-node(id='{id}')  
+
+  style(scoped, type='less').
+    :scope {
+      display: block;
+      border: solid #2196F3 0.5px;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      background: #fff;
+      cursor: grab;
+      
+      .wrap-node {
+        width: 100%;
+        height: 100%;
+        p {
+          color: #2196F3;
+        }
+      }
+
+      &.focused-node {
+        border: solid #FF4081 2px !important;
+        .wrap-node {
+          
+        }
+      }
+
+      .wrap-icon {
+        position: absolute;
+        right: 0px;
+        top: -20px;
+        cursor: pointer;
+        display: none;
+      }
+
+      &.focused-node {
+        .wrap-icon {
+          display: block;
+        }
+      }
+
+      &.drag {
+        cursor: grabbing !important;
+      }
+
+      &.active-over {
+        transform: scale(1.05) !important;
+      }
+    }
+
+  script.
+
+    var self = this;
+    this.linkedNum = this.opts.content.text;
+
+    this.id = this.opts.content.id;
+
+    this.click = clickOnNode;
+    this.over = moverTemplate;
+    this.out = moutTemplate;
+

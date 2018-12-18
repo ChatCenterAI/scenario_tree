@@ -58,9 +58,12 @@ module-modal-create-project
       // プロジェクトを作成      
       var projectObj = {
         author: session.user.uid,
+        userName: session.user.name,
+        userIcon: session.user.photoUrl,
         title: projectTitle,
         createdAt: new Date(),
         editedAt: new Date(),
+        nodeNum: 1,
       };
 
       var id = await service.db.collection("projects")
@@ -73,6 +76,7 @@ module-modal-create-project
           console.error("Error writing document: ", error);
         });
 
+      /*
       // はじめのイベントを追加してシナリオの初期化
       await service.db.collection("projects").doc(id)
         .update({'scenario': [
@@ -88,6 +92,22 @@ module-modal-create-project
             },
           ]
         });
+      */
+
+      await service.db.collection("projects").doc(id)
+        .collection('scenario')
+        .doc(`first-${id}`)
+        .set({
+          author: session.user.uid,
+          id: `first-${id}`,
+          type: 'normal',
+          nodeType: 'single',
+          text: 'Hello',
+          num: 0,
+          gui: {
+            position: {x: 150, y: 100000/2}
+          }
+        });
 
       window.location.href = `./#projects/${id}`;
 
@@ -96,4 +116,7 @@ module-modal-create-project
       $('util-modal').fadeOut(400);
       $('modal-window-content').removeClass('show');
       $(document).trigger("custom:closeModal");
+
     }
+
+

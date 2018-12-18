@@ -26,7 +26,7 @@ riot.route('/conversation/*', function(tagName) {
   var projectId = tagName;
   setTimeout(function() {
     $('content').addClass('not-opacity');
-    riot.mount('header', 'util-header');
+    riot.mount('header', 'util-header', {status: 'conversation'});
     riot.mount('content', 'page-conversation', {id: projectId});
     riot.update();
   }, 400);

@@ -1,8 +1,8 @@
 item-conversation-input-message
   div.wrap-item.f.fm.flex-between.px8
     textarea(placeholder='Message')#conversationMessageInput.pt2.pb3.px5.mr8
-    div(onclick='{send}').wrap-send.f.fh
-      img(src='./img/icon/send.svg')
+    div.wrap-send.f.fh
+      img(src='./img/icon/send.svg' onclick='{send}')#conversationSendIcon
 
 
   style(scoped, type='less').
@@ -19,7 +19,7 @@ item-conversation-input-message
           height: 24px;
           outline: none;
           resize: none;
-          font-size: 12px;
+          font-size: 14px;
         }
         .wrap-send {
           height: 100%;
@@ -36,7 +36,7 @@ item-conversation-input-message
 
     var self = this;
 
-    this.send = function(){
+    this.send = function(e){
       var textarea = document.getElementById('conversationMessageInput');
       var text = textarea.value;
 
@@ -47,4 +47,11 @@ item-conversation-input-message
         text: text,
       }, isMine);
       textarea.value = '';
+
+      // nextがある場合（オープンクエスチョンだった場合の処理）
+      var next = e.target.dataset.next;
+      if(next){
+        fireEventOfConversation(next);
+        e.target.removeAttribute('data-next');
+      }
     }

@@ -31,7 +31,7 @@ item-bubble-message
             font-weight: lighter;
             background: #f0f0f0;
             border-radius: 3px;
-            font-size: 12px;
+            font-size: 14px;
           }
         }
       }
@@ -62,7 +62,7 @@ item-bubble-message
     this.content = opts.__proto__.content;
     this.isMine = opts.__proto__.isMine;
 
-    var photoUrl = session.user.photoUrl;
+    var photoUrl = riot.currentProject.userIcon; //session.user.photoUrl;
     this.userIcon = `${photoUrl}?width=280&amp;height=280`;
     this.messageText = this.content.text;
 

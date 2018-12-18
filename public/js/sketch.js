@@ -1,11 +1,13 @@
 
-var canvas, canvasSvg;
+var canvas, canvasNodes, canvasSvg;
 
 var initCanvas = function(firstEventId){
 
   canvas = document.querySelector('module-canvas');
   canvasSvg = document.querySelector('#canvasSvg');
+  canvasNodes = document.querySelector('#canvasNodes');
   
+
   var width = canvas.offsetWidth;
   var height = canvas.offsetHeight;
 
@@ -16,7 +18,20 @@ var initCanvas = function(firstEventId){
     event = scenarioArray[i];
     var pos = event.gui.position;
   
-    if(scenarioArray[i].nodeType == 'single') addSimpleMessage(pos.x, pos.y, event, true);
+    if(scenarioArray[i].nodeType == 'single'){
+      /*
+      if(scenarioArray[i].type == 'goto'){
+        addSingleGoTo(pos.x, pos.y, event, true);
+      }else{
+        addSimpleMessage(pos.x, pos.y, event, true);
+      }
+      */
+
+      if(scenarioArray[i].type=='normal') addSimpleMessage(pos.x, pos.y, event, true);
+      if(scenarioArray[i].type=='openquestion') addOpenQuestion(pos.x, pos.y, event, true);
+      if(scenarioArray[i].type=='goto') addGoToNode(pos.x, pos.y, event, true);
+
+    }
     if(scenarioArray[i].nodeType == 'group') addSelections(pos.x, pos.y, event, true);
     
     if(firstEventId==scenarioArray[i].id){
@@ -61,7 +76,9 @@ var initCanvas = function(firstEventId){
 
 var addSimpleMessage = function(x, y, content, isLoading){
   // 前のイベントと関連づけする
-  if(!(isLoading) && targetEvent && targetEvent.nodeType!='group') targetEvent.next = content.id;
+  if(!(isLoading) && targetEvent && targetEvent.nodeType=='single'){
+    targetEvent.next = content.id;
+  }
 
   if(!(isLoading) && targetEvent && targetEvent.nodeType=='group'){
     
@@ -74,6 +91,10 @@ var addSimpleMessage = function(x, y, content, isLoading){
     targetEvent.selections = selections;
   }
 
+  /*if(!(isLoading) && content.type=='goto'){
+
+  }*/
+
 
   // 最初の要素を入れ込む
   var itemWrapper = document.createElement('div');
@@ -84,7 +105,8 @@ var addSimpleMessage = function(x, y, content, isLoading){
   itemWrapper.addEventListener("mousedown", mdownOnNode, false);
   itemWrapper.addEventListener("touchstart", mdownOnNode, false);
 
-  canvas.appendChild(itemWrapper);
+  //canvas.appendChild(itemWrapper);
+  canvasNodes.appendChild(itemWrapper);
 
   riot.mount(itemWrapper, 'item-message', {content: content});
   riot.update();
@@ -142,7 +164,8 @@ var addSelections = function(x, y, content, isLoading){
   itemWrapper.addEventListener("mousedown", mdownOnNode, false);
   itemWrapper.addEventListener("touchstart", mdownOnNode, false);
 
-  canvas.appendChild(itemWrapper);
+  //canvas.appendChild(itemWrapper);
+  canvasNodes.appendChild(itemWrapper);
 
   riot.mount(itemWrapper, 'item-selection', {content: content});
   riot.update();
@@ -171,6 +194,194 @@ var addSelections = function(x, y, content, isLoading){
   if(!(isLoading)) scenarioArray.push(content);
 }
 
+
+var addOpenQuestion = function(x, y, content, isLoading){
+  // 前のイベントと関連づけする
+  if(!(isLoading) && targetEvent && targetEvent.nodeType=='single'){
+    targetEvent.next = content.id;
+  }
+
+  if(!(isLoading) && targetEvent && targetEvent.nodeType=='group'){
+    
+    var selections = targetEvent.selections;
+    for(var i=0; i<selections.length; i++){
+      if(selections[i].id==targetSelectionEventId){
+        selections[i].next = content.id;
+      }
+    }
+    targetEvent.selections = selections;
+  }
+
+  /*if(!(isLoading) && content.type=='goto'){
+
+  }*/
+
+
+  // 最初の要素を入れ込む
+  var itemWrapper = document.createElement('div');
+  itemWrapper.classList.add('wrap-item-message');
+  itemWrapper.dataset.id = content.id;
+  itemWrapper.id = content.id;
+
+  itemWrapper.addEventListener("mousedown", mdownOnNode, false);
+  itemWrapper.addEventListener("touchstart", mdownOnNode, false);
+
+  //canvas.appendChild(itemWrapper);
+  canvasNodes.appendChild(itemWrapper);
+
+  riot.mount(itemWrapper, 'item-open-question-node', {content: content});
+  riot.update();
+
+
+  // 初期位置に配置
+  var item = {};
+  item.width = itemWrapper.offsetWidth;
+  item.height = itemWrapper.offsetHeight;
+  item.x = x;// - item.width/2;
+  item.y = y - item.height/2;
+
+  var style = itemWrapper.style;
+  style.position = 'absolute';
+  
+
+  if(isLoading){
+    style.left = `${content.gui.position.x}px`;
+    style.top = `${content.gui.position.y}px`;
+  }else{
+    style.left = `${item.x}px`;
+    style.top = `${item.y}px`;
+    content.gui.position.x = item.x;
+    content.gui.position.y = item.y;
+  }
+
+  // イベントをシナリオに追加
+  if(!(isLoading)) scenarioArray.push(content);
+  
+}
+
+
+
+var addGoToNode = function(x, y, content, isLoading){
+
+  // 最初の要素を入れ込む
+  var itemWrapper = document.createElement('div');
+  //itemWrapper.classList.add('wrap-item-message');
+  itemWrapper.dataset.id = content.id;
+  itemWrapper.id = content.id;
+
+  itemWrapper.addEventListener("mousedown", mdownOnNode, false);
+  itemWrapper.addEventListener("touchstart", mdownOnNode, false);
+
+  canvasNodes.appendChild(itemWrapper);
+
+  riot.mount(itemWrapper, 'item-goto-node', {content: content});
+  riot.update();
+
+
+  // 初期位置に配置
+  var item = {};
+  item.width = itemWrapper.offsetWidth;
+  item.height = itemWrapper.offsetHeight;
+  item.x = x;// - item.width/2;
+  item.y = y - item.height/2;
+
+  var style = itemWrapper.style;
+  style.position = 'absolute';
+  
+
+  if(isLoading){
+    style.left = `${content.gui.position.x}px`;
+    style.top = `${content.gui.position.y}px`;
+  }else{
+    style.left = `${item.x}px`;
+    style.top = `${item.y}px`;
+    content.gui.position.x = item.x;
+    content.gui.position.y = item.y;
+  }
+  
+  itemWrapper.classList.add('is-go-to-node');
+
+  if(!(isLoading)) scenarioArray.push(content);
+
+}
+
+
+/*
+var addSingleGoTo = function(x, y, content, isLoading){
+
+  // addGoToから isGoTo = true; の状態で各々のノードを呼び出す
+
+  // 前のイベントと関連させる
+  if(!(isLoading)){
+    if(goToFrom.nodeType=='single'){
+      
+      for(var i=0; scenarioArray.length; i++){
+        if(scenarioArray[i].id==goToFrom.id){
+          scenarioArray[i].next = content.id;
+          scenarioArray[i].gui.topLinePosition = {};
+          scenarioArray[i].gui.topLinePosition.origin = arrowOrigin;
+          scenarioArray[i].gui.topLinePosition.to = arrowTo;
+          break;
+        }
+      }
+
+    }else if(goToFrom.nodeType=='group'){
+
+      // TO DO: groupのgoToFrom.nextもcontent.idを入れてあげる
+
+    }
+  }
+
+  // 最初の要素を入れ込む
+  var itemWrapper = document.createElement('div');
+  itemWrapper.classList.add('wrap-item-message');
+  itemWrapper.dataset.id = content.id;
+  itemWrapper.id = content.id;
+
+  itemWrapper.addEventListener("mousedown", mdownOnNode, false);
+  itemWrapper.addEventListener("touchstart", mdownOnNode, false);
+
+  //canvas.appendChild(itemWrapper);
+  canvasNodes.appendChild(itemWrapper);
+
+  riot.mount(itemWrapper, 'item-message', {content: content});
+  riot.update();
+
+
+  // 初期位置に配置
+  var item = {};
+  item.width = itemWrapper.offsetWidth;
+  item.height = itemWrapper.offsetHeight;
+  item.x = x;// - item.width/2;
+  item.y = y - item.height/2;
+
+  var style = itemWrapper.style;
+  style.position = 'absolute';
+  
+
+  if(isLoading){
+    style.left = `${content.gui.position.x}px`;
+    style.top = `${content.gui.position.y}px`;
+  }else{
+    style.left = `${item.x}px`;
+    style.top = `${item.y}px`;
+    content.gui.position.x = item.x;
+    content.gui.position.y = item.y;
+  }
+  
+  itemWrapper.classList.add('is-go-to-node');
+
+  if(!(isLoading)) scenarioArray.push(content);
+
+}
+
+
+var addSelectionGoTo = function(x, y, content, isLoading){
+
+  // addGoToから isGoTo = true; の状態で各々のノードを呼び出す
+
+}
+*/
 
 var addLine = function(arrowOrigin, arrowTo, id){
   var topLine = document.createElementNS('http://www.w3.org/2000/svg','line');
@@ -299,7 +510,7 @@ var mmoveOnNode = function(e) {
     }
   }
 
-  // 前のテンプレートからつながってるlineの終点を修正（多分ここもうちょいスマートにかけるはず）  
+  // 前のテンプレートからつながってるlineの終点を修正
   var preNormalNodes = getNormalNodesFromScenarioByNext(targetId);
   for(var i=0; i<preNormalNodes.length; i++){
     preNormalNodes[i].gui.topLinePosition.to.x += gapX;
@@ -336,7 +547,9 @@ var mupOnNode = function(e) {
     //クラス名 .drag も消す
     drag.classList.remove("drag");
 
-    saveScenario();
+    //saveScenario();
+    console.log('mupOnNode');
+    saveScenarioAsSubcollection();
   }
 
   //ムーブベントハンドラの消去
@@ -391,12 +604,12 @@ var mdownOnLineStart = function(e){
   arrowOrigin.x = button.left + buttonOffset + canvas.scrollLeft - leftOffset;
   arrowOrigin.y = button.top + buttonOffset + canvas.scrollTop-48;
 
-  
+
   // セーブされていないlineがあったら削除してポップがでてたらそれも消す
   var unsavedLine = document.querySelector('.unsaved');
   if(unsavedLine){
     unsavedLine.parentNode.removeChild(unsavedLine);
-    var pop = document.querySelector('item-pop-after-drag');
+    var pop = document.querySelector('wrap-pop-after-drag');
     pop.classList.remove('show-pop');
 
     var nodeId = unsavedLine.id.split('-')[1];
@@ -459,6 +672,11 @@ var upOnLineStart = function(e){
     topLine.setAttribute('id', 'line-'+targetEvent.id);
     targetEvent.gui.topLineId = 'line-'+targetEvent.id;
 
+    var from = {x: arrowOrigin.x, y: arrowOrigin.y};
+    var to = {x: arrowTo.x, y: arrowTo.y};
+
+    targetEvent.gui.topLinePosition = {origin: from, to: to};
+
   }else if(targetEventNodeType=='group'){
     var selections = targetEvent.selections;
     for(var i=0; i<selections.length; i++){
@@ -515,15 +733,21 @@ var upOnLineStart = function(e){
 
     }
 
-    saveScenario();
+    //saveScenario();
+    saveScenarioAsSubcollection();
 
   }else{
     // 終点にポップを出す
-    var pop = document.querySelector('item-pop-after-drag');
-    var popOffset = 66.5/2;
+    riot.mount('wrap-pop-after-drag', 'item-pop-after-drag');
+    riot.update();
+
+    var pop = document.querySelector('wrap-pop-after-drag');
+    pop.classList.add('show-pop');
+
+    var popOffset = pop.offsetHeight/2; //= 66.5/2;
     pop.style.left = `${arrowTo.x}px`;
     pop.style.top = `${arrowTo.y - popOffset}px`;
-    pop.classList.add('show-pop');
+
   }
 
   document.body.removeEventListener("mousemove", moveOnLineStart, false);
@@ -537,8 +761,10 @@ var upOnLineStart = function(e){
 
 //--------------------------------------------------------------------------------------
 
+
 document.onkeydown = keydown;
 
+// キーボードイベント
 function keydown(e) {
   
   if (event.ctrlKey == true) {
@@ -548,15 +774,14 @@ function keydown(e) {
 }
 
 
-
-
 //--------------------------------------------------------------------------------------
 
 
 
 
 
-
+var underChoiceOfGoTo = false;
+var goToFrom, goToFromId; // goToNodeを作ろうとした時の派生元のノードのイベントを一時保存しておく変数
 
 var clickOnNode = function(e){
 
@@ -570,6 +795,50 @@ var clickOnNode = function(e){
   
   // ノードにフォーカスする
   focusNode(targetEvent);
+
+  // Go toの先を選択する場合
+  if(underChoiceOfGoTo){
+
+    underChoiceOfGoTo = false;
+
+    var goToContent = {
+      author: session.user.uid,
+      id: `goToTmp${riot.currentProject.nodeNum}`,
+      toId: targetEvent.id,
+      num: riot.currentProject.nodeNum,//scenarioArray.length,
+      type: 'goto',
+      nodeType: 'single',
+      text: targetEvent.num,
+      gui: {
+        position: {},
+      },
+    };
+
+    riot.currentProject.nodeNum++;
+
+    //goToFrom.next = `goToTmp${scenarioArray.length}`;
+
+    var preNode = getNodeFromScenarioById(goToFromId);
+    preNode.next = `goToTmp${scenarioArray.length}`;
+
+    addGoToNode(arrowTo.x, arrowTo.y, goToContent, false);
+
+    //saveScenario();
+    saveScenarioAsSubcollection(goToContent);
+ 
+    // ポップを消去
+    var pop = document.querySelector('wrap-pop-after-drag');
+    pop.classList.remove('show-pop');
+
+
+    // オーバーレイを閉じてもとのz-indexにもどす
+    $('#canvasOverlay').fadeOut(400);
+    var canvasNodes = document.getElementById('canvasNodes');
+    canvasNodes.classList.remove('add-node-z');
+
+  }
+
+  underSelectionOfGoTo = false;
 
 }
 
@@ -590,160 +859,43 @@ var focusNode = function(focusedEvent){
       riot.update();
 
     break;
+    case 'openquestion':
+
+      riot.mount('inspector', 'module-inspector-openquestion', {content: focusedEvent});
+      riot.update();
+
+    break;
+    case 'goto':
+
+      var toId = focusedEvent.toId;
+      var toEvent = getEventFromScenarioById(toId);
+
+      if(toEvent.type=='normal'){
+        riot.mount('inspector', 'module-inspector-normal', {content: toEvent});
+        riot.update();
+      }else if(toEvent.type=='selection'){
+        riot.mount('inspector', 'module-inspector-selection', {content: toEvent});
+        riot.update();
+      }
+
+      var toNode = document.getElementById(toEvent.id);
+      console.log('toNode:', toNode);
+      toNode.classList.add('focused-node');
+
+    break;
   }
 
   $('.focused-node').removeClass('focused-node');
   var node = document.getElementById(focusedEvent.id);
   node.classList.add('focused-node');
-}
 
-
-
-//---utils-------------------------------------------------------------------------------
-
-
-// scenarioのセーブ
-var saveScenario = function(){
-
-  var unsavedLine = document.querySelector('.unsaved');
-  if(unsavedLine) unsavedLine.classList.remove('unsaved');
-
-  //$('#wrapSaving').fadeIn(400);
-  service.db.collection('projects').doc(riot.currentProjectId)
-    .update({'scenario': scenarioArray})
-    .then(function(){
-      //$('#wrapSaving').fadeOut(400);
-      console.log('save');
-    });
-
-}
-
-
-
-
-// ノードの上にドラッグ中のカーソルがのっているかを判定
-var isOverTemplate = false;
-var idOfOverTemplate, overTemplateElm;
-var moverTemplate = function(e){
-  isOverTemplate = true;
-  if(isDraging){
-    var targetElem = e.currentTarget;
-    overTemplateElm = targetElem;
-    idOfOverTemplate = targetElem.dataset.id;
-    targetElem.classList.add('active-over');
-  }
-}
-
-var moutTemplate = function(e){
-  isOverTemplate = false;
-  var targetElem = e.currentTarget;
-  idOfOverTemplate = targetElem.dataset.id;
-  targetElem.classList.remove('active-over');
-}
-
-
-
-// あるidを持つイベントをシナリオから取り出す
-var getEventFromScenarioById = function(id){
-  var event;
-  for(var i=0; i<scenarioArray.length; i++){
-    if(scenarioArray[i].id == id){
-      event = scenarioArray[i];
-      break;
-    }
-  }
-  return event;
-}
-
-var getEventFromScenarioByNext = function(next){
-  var event;
-  for(var i=0; i<scenarioArray.length; i++){
-    if(scenarioArray[i].next == next){
-      event = scenarioArray[i];
-      break;
-    }
-  }
-  return event;
-}
-
-
-var getNodeFromScenarioById = function(id){
-  var node;
-  for(var i=0; i<scenarioArray.length; i++){
-    if(scenarioArray[i].nodeType == 'single'){
-      
-      if(scenarioArray[i].id == id) node = scenarioArray[i];
-
-    }else if(scenarioArray[i].nodeType == 'group'){
-
-      var selections = scenarioArray[i].selections;
-      for(var selection_i=0; selection_i<selections.length; selection_i++){
-        if(selections[selection_i].id == id) node = selections[selection_i];
-      }
-
-    }
-  } // for
-  return node;
-}
-
-// nextからnodeを取得
-var getNormalNodesFromScenarioByNext = function(next){
-
-  var resultNodes = [];
-  for(var i=0; i<scenarioArray.length; i++){
-    if(scenarioArray[i].nodeType=='single' && scenarioArray[i].next == next){
-      resultNodes.push(scenarioArray[i]);
-    }
-  }
-  return resultNodes;
-
-}
-
-var getSelectionsFromScenarioByNext = function(next){
-
-  var resultSelection = [];
-  for(var i=0; i<scenarioArray.length; i++){
-    if(scenarioArray[i].nodeType=='group'){
-      var selections = scenarioArray[i].selections;
-      for(var selection_i=0; selection_i<selections.length; selection_i++){
-        if(selections[selection_i].next==next){
-          resultSelection.push(selections[selection_i]);
-        }
-      }
-    }
+  if(focusedEvent.type=='goto'){
+    var toNode = document.getElementById(toEvent.id);
+    console.log('toNode:', toNode);
+    toNode.classList.add('focused-node');
   }
 
-  return resultSelection;
 }
 
 
 
-// nextからscenarioArrayのindexを取得
-var getIndexesOfNormalNodesFromScenarioByNext = function(next){
-
-  var resultIndexs = [];
-  for(var i=0; i<scenarioArray.length; i++){
-    if(scenarioArray[i].nodeType=='single' && scenarioArray[i].next == next){
-      resultIndexs.push({scenarioIndex: i});
-    }
-  }
-  return resultIndexs;
-
-}
-
-var getIndexesOfSelectionsFromScenarioByNext = function(next){
-
-  var resultIndexs = [];
-  for(var i=0; i<scenarioArray.length; i++){
-    if(scenarioArray[i].nodeType=='group'){
-      var selections = scenarioArray[i].selections;
-      for(var selection_i=0; selection_i<selections.length; selection_i++){
-        if(selections[selection_i].next==next){
-          resultIndexs.push({scenarioIndex: i, selectionIndex: selection_i});
-        }
-      }
-    }
-  }
-
-  return resultIndexs;
-}
