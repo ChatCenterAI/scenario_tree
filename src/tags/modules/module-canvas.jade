@@ -5,7 +5,6 @@ module-canvas#canvas
   wrap-pop-after-drag
     item-pop-after-drag
   div#canvasOverlay
-  //item-selection
 
   style(scoped, type='less').
     :scope {
@@ -106,39 +105,13 @@ module-canvas#canvas
           return resultScenario;
         });
 
-      
-      
       scenarioArray = scenario;
+      addHistory();
+      
       //scenarioArray = self.project.scenario;
-      initCanvas(firstEventName);
+      loadCanvas(firstEventName, true);
 
       $('#loading').fadeOut(400);
-
-      /*  
-      var william = await service.db.collection("projects")
-        .doc('LC9c4DBFpbGS3FayhtxQ')
-        .get()
-        .then(function(doc) {
-          var data = doc.data()
-          data.id = doc.id;
-          return data;
-        })
-        .catch(function(error) {
-          console.error("Error writing document: ", error);
-        });
-      debugger
-
-      for(var i=0; i<william.scenario.length; i++){
-        var obj = william.scenario[i];
-        obj.author = 'VSiXUT65zwWBz3SYKqtyIsR7jm73';
-        await service.db.collection("projects")
-          .doc('LC9c4DBFpbGS3FayhtxQ')
-          .collection('scenario')
-          .doc(obj.id)
-          .set(obj);
-      }
-      */
-      
 
 
     }

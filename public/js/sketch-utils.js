@@ -19,11 +19,15 @@ var saveScenario = function(){
 }
 */
 
+var scenarioHistories = [];
+
 // scenarioのセーブ
 async function saveScenarioAsSubcollection(scenarioObj){
 
   var unsavedLine = document.querySelector('.unsaved');
   if(unsavedLine) unsavedLine.classList.remove('unsaved');
+
+  addHistory();
 
   // nodeNumを更新
   service.db.collection('projects').doc(riot.currentProjectId)
@@ -68,7 +72,7 @@ async function saveScenarioAsSubcollection(scenarioObj){
         .collection('scenario')
         .doc(scenarioOfDatabase[i].id)
         .delete();
-      console.log('delete: ', scenarioOfDatabase[i]);
+      //console.log('delete: ', scenarioOfDatabase[i]);
       i++;
       continue;
     }
@@ -79,12 +83,29 @@ async function saveScenarioAsSubcollection(scenarioObj){
         .collection('scenario')
         .doc(eventOfClient.id)
         .update(eventOfClient);
-      console.log('save to sub: ', eventOfClient);
+      //console.log('save to sub: ', eventOfClient);
     }
 
   }
 
 }
+
+
+
+
+
+// 履歴の管理
+var currentHistoryIndex = 0;
+var addHistory = function(){
+  //var history = scenarioArray.slice(0, scenarioArray.length);
+  //scenarioHistories.push(history);
+
+  var history = JSON.stringify(scenarioArray);
+  scenarioHistories.push(JSON.parse(history));
+
+  currentHistoryIndex = 0;
+}
+
 
 
 

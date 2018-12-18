@@ -1,7 +1,7 @@
 
 var canvas, canvasNodes, canvasSvg;
 
-var initCanvas = function(firstEventId){
+var loadCanvas = function(firstEventId, letScrollToFirst){
 
   canvas = document.querySelector('module-canvas');
   canvasSvg = document.querySelector('#canvasSvg');
@@ -19,22 +19,13 @@ var initCanvas = function(firstEventId){
     var pos = event.gui.position;
   
     if(scenarioArray[i].nodeType == 'single'){
-      /*
-      if(scenarioArray[i].type == 'goto'){
-        addSingleGoTo(pos.x, pos.y, event, true);
-      }else{
-        addSimpleMessage(pos.x, pos.y, event, true);
-      }
-      */
-
       if(scenarioArray[i].type=='normal') addSimpleMessage(pos.x, pos.y, event, true);
       if(scenarioArray[i].type=='openquestion') addOpenQuestion(pos.x, pos.y, event, true);
       if(scenarioArray[i].type=='goto') addGoToNode(pos.x, pos.y, event, true);
-
     }
     if(scenarioArray[i].nodeType == 'group') addSelections(pos.x, pos.y, event, true);
     
-    if(firstEventId==scenarioArray[i].id){
+    if(letScrollToFirst && firstEventId==scenarioArray[i].id){
       // はじめのメッセージのところまでスクロール
       document.querySelector('module-canvas').scrollLeft = pos.x - 100;
       document.querySelector('module-canvas').scrollTop = pos.y - window.innerHeight/2;
@@ -90,10 +81,6 @@ var addSimpleMessage = function(x, y, content, isLoading){
     }
     targetEvent.selections = selections;
   }
-
-  /*if(!(isLoading) && content.type=='goto'){
-
-  }*/
 
 
   // 最初の要素を入れ込む
@@ -305,84 +292,6 @@ var addGoToNode = function(x, y, content, isLoading){
 
 }
 
-
-/*
-var addSingleGoTo = function(x, y, content, isLoading){
-
-  // addGoToから isGoTo = true; の状態で各々のノードを呼び出す
-
-  // 前のイベントと関連させる
-  if(!(isLoading)){
-    if(goToFrom.nodeType=='single'){
-      
-      for(var i=0; scenarioArray.length; i++){
-        if(scenarioArray[i].id==goToFrom.id){
-          scenarioArray[i].next = content.id;
-          scenarioArray[i].gui.topLinePosition = {};
-          scenarioArray[i].gui.topLinePosition.origin = arrowOrigin;
-          scenarioArray[i].gui.topLinePosition.to = arrowTo;
-          break;
-        }
-      }
-
-    }else if(goToFrom.nodeType=='group'){
-
-      // TO DO: groupのgoToFrom.nextもcontent.idを入れてあげる
-
-    }
-  }
-
-  // 最初の要素を入れ込む
-  var itemWrapper = document.createElement('div');
-  itemWrapper.classList.add('wrap-item-message');
-  itemWrapper.dataset.id = content.id;
-  itemWrapper.id = content.id;
-
-  itemWrapper.addEventListener("mousedown", mdownOnNode, false);
-  itemWrapper.addEventListener("touchstart", mdownOnNode, false);
-
-  //canvas.appendChild(itemWrapper);
-  canvasNodes.appendChild(itemWrapper);
-
-  riot.mount(itemWrapper, 'item-message', {content: content});
-  riot.update();
-
-
-  // 初期位置に配置
-  var item = {};
-  item.width = itemWrapper.offsetWidth;
-  item.height = itemWrapper.offsetHeight;
-  item.x = x;// - item.width/2;
-  item.y = y - item.height/2;
-
-  var style = itemWrapper.style;
-  style.position = 'absolute';
-  
-
-  if(isLoading){
-    style.left = `${content.gui.position.x}px`;
-    style.top = `${content.gui.position.y}px`;
-  }else{
-    style.left = `${item.x}px`;
-    style.top = `${item.y}px`;
-    content.gui.position.x = item.x;
-    content.gui.position.y = item.y;
-  }
-  
-  itemWrapper.classList.add('is-go-to-node');
-
-  if(!(isLoading)) scenarioArray.push(content);
-
-}
-
-
-var addSelectionGoTo = function(x, y, content, isLoading){
-
-  // addGoToから isGoTo = true; の状態で各々のノードを呼び出す
-
-}
-*/
-
 var addLine = function(arrowOrigin, arrowTo, id){
   var topLine = document.createElementNS('http://www.w3.org/2000/svg','line');
   topLine.setAttribute('x1', arrowOrigin.x);
@@ -429,11 +338,6 @@ var mdownOnNode = function(e) {
   }
   targetEventNodeType = targetEvent.nodeType;
 
-  /*
-  if(targetEventNodeType=='selection'){
-    targetSelectionEventId = e.target.dataset.selectionid;
-  }
-  */
 
   //クラス名に .drag を追加
   this.classList.add("drag");
@@ -756,22 +660,6 @@ var upOnLineStart = function(e){
 }
 
 
-
-
-
-//--------------------------------------------------------------------------------------
-
-
-document.onkeydown = keydown;
-
-// キーボードイベント
-function keydown(e) {
-  
-  if (event.ctrlKey == true) {
-    console.log(event);
-  }
-  
-}
 
 
 //--------------------------------------------------------------------------------------
