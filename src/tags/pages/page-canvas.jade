@@ -77,14 +77,9 @@ page-canvas
 
     this.urlToCopy = `${location.host}/#conversation/${this.scenarioId}`;
 
-    /*
-    this.copyLink = function(){
-      self.copy(self.urlToCopy);
-    }
-    */
-
     this.copy = function(url){
       console.log('copy this:', url);
+      mixpanel.track('bot url was copied from preview header');
       var element = document.querySelector('.js-copytext');
       var range = document.createRange();
       range.selectNode(element);
@@ -97,9 +92,11 @@ page-canvas
 
       selection.removeAllRanges();
 
-      alert('コピーしました。');
+      alert('botのリンクをコピーしました。');
     }
 
+    riot.urlToCopy = this.urlToCopy;
+    //riot.copyUrl = this.copy;
 
     this.on('mount', function(){
 

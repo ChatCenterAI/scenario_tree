@@ -1,7 +1,7 @@
 item-message(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='{id}' data-id='{id}').node
   div.wrap-node
     div.wrap-node-content.f.fm.flex-between
-      p.text.line-clamp-1.pl12.pr8.pt8.pb7 {text}
+      p.text.line-clamp-1.pl12.pr8.pt8.pb7 
       div(onmousedown='{down}').wrap-drag-button.pr8.f.fm
         div.drag-button
   div.wrap-num
@@ -23,7 +23,8 @@ item-message(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='{id}'
         overflow: hidden;
         
         /*filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));*/
-        box-shadow: 1px 1px 4px rgba(0,0,0,0.4);
+
+        /*box-shadow: 1px 1px 4px rgba(0,0,0,0.4);*/
 
         transform: scale(1);
         .wrap-node-content {
@@ -63,6 +64,7 @@ item-message(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='{id}'
       &.focused-node {
         .wrap-node {
           border: solid #FF4081 2px !important;
+          box-shadow: 1px 1px 4px rgba(0,0,0,0.4);
         }
       }
 
@@ -128,4 +130,10 @@ item-message(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='{id}'
         console.log(e);
       }
       */
+
+      // self.textを直接バインドすると改行が反映されないのでdomから操作する
+      var node = document.getElementById(self.id);
+      var nodeText = node.getElementsByClassName('text')[0];
+      nodeText.innerText = self.text;
+
     });

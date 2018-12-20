@@ -50,6 +50,9 @@ module-modal-create-project
     });
 
     this.createProject = async ()=>{
+
+      mixpanel.track('new project was created');
+
       // タイトルがなければreturn
       var input = document.querySelector('#projectTitleInput');
       var projectTitle = input.value;

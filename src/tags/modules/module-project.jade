@@ -39,6 +39,8 @@ module-project(onclick='{toCanvas}').mb20
     this.editedAt = moment(opts.content.editedAt).format('ddd DD, YYYY, HH:mm');
 
     this.toCanvas = function() {
+      mixpanel.track('existing project was opened');
+
       session.isNewProject = false;
       window.location.href = `./#projects/${opts.content.id}`;
     }

@@ -56,10 +56,8 @@ item-pop-after-drag
 
     this.addSimple = function(){
 
-      //addHistory();
+      mixpanel.track('simple message node was added');
       
-      // 前のイベントのtopLineの座標を保存
-      //targetEvent.gui.topLinePosition = {origin: arrowOrigin, to: arrowTo};
 
       // もし始点にすでにlineがあったらguiから削除する
       if(targetEvent.gui.topLineId){
@@ -98,7 +96,7 @@ item-pop-after-drag
         num: riot.currentProject.nodeNum,//scenarioArray.length,
         type: 'normal',
         nodeType: 'single',
-        text: 'This is My Message',
+        text: 'Message',
         gui: {
           position: {},
         },
@@ -111,15 +109,17 @@ item-pop-after-drag
       // scenarioをupdateする
       //saveScenario();
       saveScenarioAsSubcollection(content);
+      focusNode(content);
 
       // ポップを消去
       var pop = document.querySelector('wrap-pop-after-drag');
       pop.classList.remove('show-pop');
 
-      console.log('after adding', scenarioArray);
     }
 
     this.addSelection = function(){
+
+      mixpanel.track('selection node was added');
 
       var from = {x: arrowOrigin.x, y: arrowOrigin.y};
       var to = {x: arrowTo.x, y: arrowTo.y};
@@ -153,11 +153,14 @@ item-pop-after-drag
 
       //saveScenario();
       saveScenarioAsSubcollection(content);
+      focusNode(content);
 
     }
 
 
     this.addOpenQuestion = function(){
+
+      mixpanel.track('open question node was added');
 
       var from = {x: arrowOrigin.x, y: arrowOrigin.y};
       var to = {x: arrowTo.x, y: arrowTo.y};
@@ -188,6 +191,7 @@ item-pop-after-drag
 
       //saveScenario();
       saveScenarioAsSubcollection(content);
+      focusNode(content);
 
     }
 

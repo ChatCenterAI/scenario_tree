@@ -1,6 +1,7 @@
 module-canvas#canvas
   svg#canvasSvg
     line#lineForPreview
+    //line#lineForGoToPreview
   div#canvasNodes
   wrap-pop-after-drag
     item-pop-after-drag
@@ -30,6 +31,9 @@ module-canvas#canvas
           pointer-events: auto;
         }
         #lineForPreview {
+          display: none;
+        }
+        #lineForGoToPreview {
           display: none;
         }
         .show {
@@ -107,7 +111,7 @@ module-canvas#canvas
 
       scenarioArray = scenario;
       addHistory();
-      
+
       //scenarioArray = self.project.scenario;
       loadCanvas(firstEventName, true);
 

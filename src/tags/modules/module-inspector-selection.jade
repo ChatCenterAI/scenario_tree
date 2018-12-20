@@ -2,14 +2,14 @@ module-inspector-selection
   div.wrap-module.px8.pt16
     p.title.mb12 Selection
     div.wrap-ask.mb10
-      textarea(placeholder="What is your choice?")#messageInput.pt3.pb4.px4.mr6 {text}
+      textarea(placeholder="What is your choice?" onkeyup='{save}')#messageInput.pt3.pb4.px4.mr6 {text}
     div.mb4
       p.title-buttons.mb8 Buttons
-      textarea(each='{item in selections}' placeholder="Selection").textarea-selection.pt3.pb4.px4.mr6 {item.label}
+      textarea(each='{item in selections}' placeholder="Selection" onkeyup='{save}' onfocus="this.select();").textarea-selection.pt3.pb4.px4.mr6 {item.label}
     div(onclick='{addSelection}').wrap-add.mb12.f.fm
       img(src='./img/icon/add-blue.svg').add-icon.mr4
       p.add-text Add Button
-    p(onclick='{save}').wrap-button.px10.py8 Save
+    //p(onclick='{save}').wrap-button.px10.py8 Save
 
   style(scoped, type='less').
     :scope {
@@ -70,7 +70,10 @@ module-inspector-selection
     this.selections = this.content.selections;
 
     this.on('mount', function(){
-
+      var textarea = document.querySelector('#messageInput');
+      textarea.value = self.content.text;
+      textarea.focus();
+      textarea.select();
     });
 
     this.addSelection = function(){
@@ -84,6 +87,64 @@ module-inspector-selection
 
     }
 
+
+    self.saveTimer;
+    this.keyup = function(e){
+
+      e.preventDefault();
+
+      var askElem = document.getElementById('messageInput');
+      self.content.text = askElem.value;
+
+      var selectionTextareas = document.getElementsByClassName('textarea-selection');
+      for(var i=0; i<selectionTextareas.length; i++){
+        this.content.selections[i].label = selectionTextareas[i].value;
+        if(selectionTextareas[i].value=='') selectionTextareas[i].value = 'No Text';
+      }
+
+      // ノードの追加をGUIに反映
+      var targetElem = document.getElementById(self.content.id);
+      var preHeight = targetElem.offsetHeight;
+
+      riot.mount(targetElem, 'item-selection', {content: self.content});
+      riot.update();
+
+      var gapY = targetElem.offsetHeight - preHeight;
+
+      targetElem.style.top = (parseInt(targetElem.style.top) - gapY/2) + 'px';
+      self.content.gui.position.y = parseInt(targetElem.style.top);
+
+      // selectionsのtopLineのoriginを調整
+      for(var i=0; i<self.content.selections.length; i++){
+        if(self.content.selections[i].topLinePosition){
+          var selectionId = self.content.selections[i].id;
+          var topLine = document.getElementById(`line-${selectionId}`);
+          var preY = parseInt(topLine.getAttribute('y1'));
+          topLine.setAttribute('y1', preY-gapY/2);
+          self.content.selections[i].topLinePosition.origin.y -= gapY/2;
+        }
+      }
+
+      // 変更をscenarioArrayに反映して保存
+      for(var i=0; i<scenarioArray.length; i++){
+        if(scenarioArray[i].id==self.content.id){
+          scenarioArray[i] = self.content;
+        }
+      }
+
+      // 入力中はセーブさせない
+      clearTimeout(self.saveTimer);
+      self.saveTimer = setTimeout(self.save, 800);
+      //self.save();
+    }
+
+    
+    this.save = function(){
+      saveScenarioAsSubcollection(self.content);
+    }
+
+
+    /*
     this.save = function() {
 
       var askElem = document.getElementById('messageInput');
@@ -129,6 +190,6 @@ module-inspector-selection
       saveScenarioAsSubcollection(self.content);
       
     }
-
+    */
 
 

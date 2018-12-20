@@ -128,10 +128,10 @@ var convertScenarioArrayToCsv = function(){
           // 次のノードがselectionだったら抜ける
           if(nextNode.type=='selection' || !nextNode.next) break;
 
-          debugger
+          // TODO: gotoNodeのexport
           // 次のノードがgotoNodeなら
           if(nextNode.type=='goto'){
-            debugger
+            
             // gotoのexportやっているところ
             nextNode = getEventFromScenarioById(nextNode.toId);
           }

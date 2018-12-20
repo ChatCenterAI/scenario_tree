@@ -1,9 +1,12 @@
 util-header
   div(if="{status == 'canvas'}").wrap-util.f.fm.flex-between
     div
-    div.icon-export.f.fh
+    //div.icon-export.f.fh
       img(onclick='{export}' src='./img/icon/export2.svg')
       a(style='display: none;' href='#')#downloader
+    div.icon.f.fh
+      img(onclick='{copy.bind(this, riot.urlToCopy)}' src='./img/icon/share2.svg')
+      a(style='opacity: 0; position: fixed; z-index: -1;').js-copytext-header {urlToCopy}
 
   div(if="{status == 'conversation'}").wrap-util.f.fm.flex-between
     div
@@ -36,6 +39,14 @@ util-header
           }
         }
 
+        .icon {
+          width: 48px;
+          img {
+            width: 24px;
+            cursor: pointer;
+          }
+        }
+
         .wrap-label {
           position: absolute;
           width: 100%;
@@ -61,3 +72,27 @@ util-header
     }
 
 
+    //this.urlToCopy = this.urlToCopy;
+    //this.copy = riot.copyUrl;
+
+    
+    this.copy = function(url){
+      console.log('copy this:', url);
+      mixpanel.track('bot url was copied from header');
+
+      var element = document.querySelector('.js-copytext-header');
+      element.innerText = url;
+      var range = document.createRange();
+      range.selectNode(element);
+
+      var selection = getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+
+      document.execCommand('copy');
+
+      selection.removeAllRanges();
+
+      alert('botのリンクをコピーしました。');
+    }
+    

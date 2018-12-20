@@ -114,3 +114,32 @@ app
         label: 'link label',
       },
     };
+
+
+
+
+    this.afterAuth = function(user){
+      console.log('after');
+      mixpanel.identify(user.uid);
+      mixpanel.register({
+        userId: user.uid,
+        name: user.name
+      });
+      mixpanel.people.set({
+        "$email": user.email,
+        "$last_login": new Date(),
+        userId: user.uid,
+        name: user.name
+      });
+    }
+
+    riot.loadAppTimer = setInterval(function(){
+      if(session.user){
+        clearInterval(riot.loadAppTimer);
+        self.afterAuth(session.user);
+      }
+    }, 800);
+    
+
+
+

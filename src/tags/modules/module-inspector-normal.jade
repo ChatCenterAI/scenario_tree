@@ -1,9 +1,9 @@
 module-inspector-normal
   div.wrap-module.px8.pt16
     p.title.mb12 Normal Message
-    div
-      textarea(placeholder="Message")#messageInput.pt3.pb4.px4.mr6.mb12
-      p(onclick='{save}').wrap-button.px10.py8 Save
+    form(name='form')
+      textarea(placeholder="Message" name='focusTarget' onkeyup='{keyup}')#messageInput.pt3.pb4.px4.mr6.mb12
+      //p(onclick='{save}').wrap-button.px10.py8 Save
 
 
   style(scoped, type='less').
@@ -38,15 +38,75 @@ module-inspector-normal
       }
     }
 
+
   script.
 
     var self = this;
     this.content = opts.__proto__.content;
 
     this.on('mount', function(){
-      document.querySelector('#messageInput').value = self.content.text;
+      var textarea = document.querySelector('#messageInput');
+      textarea.value = self.content.text;
+      textarea.focus();
+      textarea.select();
     });
 
+    self.saveTimer;
+    this.keyup = function(e){
+      e.preventDefault();
+
+      var value = document.querySelector('#messageInput').value;
+      self.content.text = value;
+
+      // nodeのテキストを変更
+      var node = document.getElementById(self.content.id);
+      var nodeText = node.getElementsByClassName('text')[0];
+
+      // 変更してずれる座標分の修正
+      var preWidth = node.offsetWidth;
+      var preHeight = node.offsetHeight;
+      nodeText.innerText = value;
+      
+      var gapX = node.offsetWidth - preWidth;
+      var gapY = node.offsetHeight - preHeight;
+
+      // nodeの座標をtopLineが中心になるように修正
+      var preNodePosY = self.content.gui.position.y;
+      self.content.gui.position.y = preNodePosY - gapY/2;
+      node.style.top = self.content.gui.position.y + 'px';
+
+      // topLineの修正
+      var topLine = document.getElementById(`line-${self.content.id}`);
+      if(topLine){
+        var preX = parseInt(topLine.getAttribute('x1'));
+        //var preY = parseInt(topLine.getAttribute('y1'));
+        var x = preX + gapX;
+        //var y = preY + gapY/2;
+        topLine.setAttribute('x1', x);
+        //topLine.setAttribute('y1', y);
+        self.content.gui.topLinePosition.origin.x = x;
+        //self.content.gui.topLinePosition.origin.y = y;
+      }
+
+      // 変更をscenarioArrayに反映して保存
+      for(var i=0; i<scenarioArray.length; i++){
+        if(scenarioArray[i].id==self.content.id){
+          scenarioArray[i] = self.content;
+        }
+      }
+
+      // 入力中はセーブさせない
+      clearTimeout(self.saveTimer);
+      self.saveTimer = setTimeout(self.save, 800);
+      //self.save();
+    }
+
+    
+    this.save = function(){
+      saveScenarioAsSubcollection(self.content);
+    }
+    
+    /*
     this.save = function(){
 
       var value = document.querySelector('#messageInput').value;
@@ -87,10 +147,9 @@ module-inspector-normal
         if(scenarioArray[i].id==self.content.id){
           scenarioArray[i] = self.content;
         }
-      }      
+      }
 
-      //saveScenario();
       saveScenarioAsSubcollection(self.content);
 
     }
-
+    */    

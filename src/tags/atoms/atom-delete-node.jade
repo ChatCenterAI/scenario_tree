@@ -22,7 +22,7 @@ atom-delete-node
     this.id = opts.id;
     this.deleteNode = function(id, e) {
 
-      //addHistory();
+      mixpanel.track('node was deleted');
       
       if(e){
         e.preventDefault();
@@ -93,6 +93,10 @@ atom-delete-node
       for(var i=0; i<gotoEvents.length; i++){
         this.deleteNode(gotoEvents[i].id);
       }
+
+      // goto用のプレヴューも隠す
+      var lineForGoToPreview = document.getElementById('lineForGoToPreview');
+      if(lineForGoToPreview) lineForGoToPreview.classList.remove('show');
 
 
       // uponNodeでセーブされてしまうのでここではいったん関数を呼ばない

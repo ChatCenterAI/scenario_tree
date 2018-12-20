@@ -88,6 +88,8 @@ async function saveScenarioAsSubcollection(scenarioObj){
 
   }
 
+  console.log('saved');
+
 }
 
 
@@ -99,6 +101,8 @@ var currentHistoryIndex = 0;
 var addHistory = function(){
   //var history = scenarioArray.slice(0, scenarioArray.length);
   //scenarioHistories.push(history);
+
+  if(scenarioHistories.length > 10) scenarioHistories.shift();
 
   var history = JSON.stringify(scenarioArray);
   scenarioHistories.push(JSON.parse(history));

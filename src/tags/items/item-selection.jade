@@ -23,7 +23,7 @@ item-selection(onclick='{click}' onmouseover='{over}' onmouseout='{out}' data-id
       transform: scale(1);
 
       .wrap-node {
-        box-shadow: 1px 1px 4px rgba(0,0,0,0.4);
+        /*box-shadow: 1px 1px 4px rgba(0,0,0,0.4);*/
         overflow: hidden;
         border-radius: 3px;
         /*background: #2196F3;*/
@@ -84,6 +84,7 @@ item-selection(onclick='{click}' onmouseover='{over}' onmouseout='{out}' data-id
       &.focused-node {
         .wrap-node {
           border: solid #FF4081 2px !important;
+          box-shadow: 1px 1px 4px rgba(0,0,0,0.4);
         }
       }
 

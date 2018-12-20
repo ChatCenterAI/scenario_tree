@@ -63,6 +63,13 @@ var loadCanvas = function(firstEventId, letScrollToFirst){
   } // for
 
 
+  // goto用のlineを追加
+  var topLine = document.createElementNS('http://www.w3.org/2000/svg','line');
+  topLine.setAttribute('stroke', '#FF4081');
+  topLine.setAttribute('id', 'lineForGoToPreview');
+
+  canvasSvg.appendChild(topLine);
+
 }
 
 var addSimpleMessage = function(x, y, content, isLoading){
@@ -269,7 +276,7 @@ var addGoToNode = function(x, y, content, isLoading){
   var item = {};
   item.width = itemWrapper.offsetWidth;
   item.height = itemWrapper.offsetHeight;
-  item.x = x;// - item.width/2;
+  item.x = x;
   item.y = y - item.height/2;
 
   var style = itemWrapper.style;
@@ -288,7 +295,11 @@ var addGoToNode = function(x, y, content, isLoading){
   
   itemWrapper.classList.add('is-go-to-node');
 
-  if(!(isLoading)) scenarioArray.push(content);
+  if(!(isLoading)){
+    //var preNode = getNodeFromScenarioById(goToFromId);
+    //preNode.next = goToFromId;
+    scenarioArray.push(content);
+  }
 
 }
 
@@ -674,12 +685,7 @@ var goToFrom, goToFromId; // goToNodeを作ろうとした時の派生元のノ�
 var clickOnNode = function(e){
 
   targetId = $(e.target).parents('.node')[0].dataset.id;
-  for(var i=0; i<scenarioArray.length; i++){
-    if(targetId==scenarioArray[i].id){
-      targetEvent = scenarioArray[i];
-      break;
-    }
-  }
+  targetEvent = getEventFromScenarioById(targetId);
   
   // ノードにフォーカスする
   focusNode(targetEvent);
@@ -702,14 +708,12 @@ var clickOnNode = function(e){
       },
     };
 
-    riot.currentProject.nodeNum++;
-
-    //goToFrom.next = `goToTmp${scenarioArray.length}`;
-
     var preNode = getNodeFromScenarioById(goToFromId);
-    preNode.next = `goToTmp${scenarioArray.length}`;
+    preNode.next = `goToTmp${riot.currentProject.nodeNum}`;
 
     addGoToNode(arrowTo.x, arrowTo.y, goToContent, false);
+
+    riot.currentProject.nodeNum++;
 
     //saveScenario();
     saveScenarioAsSubcollection(goToContent);
@@ -730,8 +734,14 @@ var clickOnNode = function(e){
 
 }
 
-
+var currentFocusedEvent;
 var focusNode = function(focusedEvent){
+
+  currentFocusedEvent = focusedEvent;
+
+  // Go Toのプレヴュー用のラインを削除
+  var lineForGoToPreview = document.getElementById('lineForGoToPreview');
+  if(lineForGoToPreview) lineForGoToPreview.classList.remove('show');
 
   switch(focusedEvent.type){
     case 'normal':
@@ -767,8 +777,24 @@ var focusNode = function(focusedEvent){
       }
 
       var toNode = document.getElementById(toEvent.id);
-      console.log('toNode:', toNode);
       toNode.classList.add('focused-node');
+
+      // Go Toがどこにつながっているかをプレヴュー
+      var fromNode = document.getElementById(focusedEvent.id);
+      
+      var x1 = parseInt(fromNode.style.left);
+      var y1 = parseInt(fromNode.style.top) + fromNode.offsetHeight/2;
+      var x2 = parseInt(toNode.style.left) + toNode.offsetWidth;///2;
+      var y2 = parseInt(toNode.style.top) + toNode.offsetHeight/2;
+
+      if(lineForGoToPreview){
+        lineForGoToPreview.classList.add('show');
+        lineForGoToPreview.setAttribute('x1', x1);
+        lineForGoToPreview.setAttribute('y1', y1);
+        lineForGoToPreview.setAttribute('x2', x2);
+        lineForGoToPreview.setAttribute('y2', y2);
+        lineForGoToPreview.id = 'lineForGoToPreview';
+      }
 
     break;
   }
