@@ -1,0 +1,142 @@
+module-modal-select-project
+  div.wrap-module.px14.py16
+    p.title.pb12 Select project you want to connect to the node
+    div.wrap-projects
+      div(each='{item in projects}' onclick='{addGoToNode.bind(this, item.id, item.title)}' data-id='{item.id}').project.f.fm.flex-between
+        p {item.title}
+        div.wrap-img.f.fh
+          img(src='{item.userIcon}')
+
+
+
+  style(scoped, type='less').
+    :scope {
+      display: block;
+      background: #FFF;
+      .wrap-module {
+        .title {
+          font-size: 16px;
+          font-weight: 400;
+          border-bottom: solid rgba(153,153,153,0.4) 0.5px;
+        }
+        .project {
+          border-bottom: solid rgba(153,153,153,0.4) 0.5px;
+          height: 44px;
+          cursor: pointer;
+          p {
+            color: #2196F3;
+          }
+          .wrap-img {
+            width: 32px;
+            height: 32px;
+            overflow: hidden;
+            border-radius: 50%;
+            img {
+              height: 100%;
+              object-fit: cover;
+            }
+          }
+        }
+      }
+    }
+
+  script.
+
+    var self = this;
+
+    this.loadProjects = async ()=>{
+      
+      var projects = await service.db.collection("projects")
+        .orderBy("editedAt", "desc")
+        .where('author', '==', session.user.uid)
+        .get().then(function(querySelectors){
+          var projects = [];
+          querySelectors.forEach(function(doc) {
+            var data = doc.data();
+            data.id = doc.id;
+            projects.push(data);
+          });
+          return projects;
+        });
+
+      self.projects = projects;
+      self.update();
+
+      // modalを表示
+      $('modal-window-content').addClass('show');
+      $(document).on("custom:closeModal", function() {
+        $('module-modal-create-project').removeClass('show');
+        self.unmount(true);
+        $('util-modal').fadeOut(400);
+      });
+
+    }
+
+    this.loadProjects();
+
+    this.on('mount', function(){
+      
+    });
+
+
+    this.addGoToNode = async function(id, title, e) {
+      
+      var additionalScenario = await service.db.collection("projects")
+        .doc(id)
+        .collection('scenario')
+        .get().then(function(querySelectors){
+          var additionalScenario = [];
+          querySelectors.forEach(function(doc) {
+            var data = doc.data();
+            data.id = doc.id;
+            additionalScenario.push(data);
+          });
+          return additionalScenario;
+        });
+
+      var firstEvent;
+      for(var value of additionalScenario){
+        if(`first-${id}`==value.id) firstEvent = value;
+      }
+
+      var from = {x: arrowOrigin.x, y: arrowOrigin.y};
+      var to = {x: arrowTo.x, y: arrowTo.y};
+
+      // この時のターゲットはgotoそのものではない。
+      if(targetEvent.nodeType=='single'){
+        targetEvent.gui.topLinePosition = {origin: from, to: to};
+      }else if(targetEvent.nodeType=='group'){
+        targetEvent.topLinePosition = {origin: from, to: to};
+      }
+
+      // contentを作成
+      var content = {
+        author: session.user.uid,
+        id: `goToAnotherProjectTmp${riot.currentProject.nodeNum}`,
+        num: riot.currentProject.nodeNum,//scenarioArray.length,
+        type: 'gotoAnotherProject',
+        nodeType: 'single',
+        text: `${title}`,
+        scenarioId: id,
+        firstEventOfScenario: firstEvent.id,
+        gui: {
+          position: {},
+        },
+      };
+      riot.currentProject.nodeNum++;
+
+      addGoToAnotherProjectNode(arrowTo.x, arrowTo.y, content, false);
+
+      // モーダルを閉まう
+      $(document).trigger("custom:closeModal");
+
+      saveScenarioAsSubcollection(content);
+      focusNode(content);
+
+      // ポップを消去
+      var pop = document.querySelector('wrap-pop-after-drag');
+      pop.classList.remove('show-pop');
+    }
+
+
+

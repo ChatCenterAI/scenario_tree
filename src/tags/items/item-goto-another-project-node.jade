@@ -1,0 +1,97 @@
+item-goto-another-project-node(onclick='{click}' onmouseover='{over}' onmouseout='{out}' id='{id}' data-id='{id}').node
+  div.wrap-node
+    div.wrap-node-content
+      p.text.line-clamp-1.px8.pt8.pb7 {text}
+  div.wrap-num
+    p {num}
+  div.wrap-icon.f.fh
+    atom-delete-node(id='{id}')
+
+
+  style(scoped, type='less').
+    :scope {
+      position: absolute;
+      display: inline-block;
+      transition: transform 0.2s;
+      cursor: grab;
+
+      .wrap-node {
+        border: solid #2196F3 0.5px;
+        background: #2196F3;
+        border-radius: 3px;
+        overflow: hidden;
+        
+        transform: scale(1);
+        .wrap-node-content {
+          position: relative;
+          overflow: visible;
+          p {
+            /*white-space: nowrap;*/
+            display: block;
+            color: #fff;
+            letter-spacing: 0.6px;
+            font-weight: 300;
+            width: 100%;
+            max-width: 180px;
+          }
+        }
+
+      } /*wrap-node*/
+
+      &.drag {
+        cursor: grabbing !important;
+      }
+      &.active-over {
+        transform: scale(1.05) !important;
+      }
+
+      &.focused-node {
+        .wrap-node {
+          border: solid #FF4081 2px !important;
+          box-shadow: 1px 1px 4px rgba(0,0,0,0.4);
+        }
+      }
+
+      .wrap-num {
+        position: absolute;
+        left: 4px;
+        top: -20px;
+        p {
+          font-size: 14px;
+          text-align: center;
+          color: #2196F3;
+        }
+      }
+
+      .wrap-icon {
+        position: absolute;
+        right: 0px;
+        top: -20px;
+        cursor: pointer;
+        display: none;
+      }
+      &.focused-node {
+        .wrap-icon {
+          display: block;
+        }
+      }
+
+    }
+
+  script.
+
+    var self = this;
+    this.id = this.opts.content.id;
+    this.text = this.opts.content.text;
+    this.num = this.opts.content.num;
+
+    this.down = mdownOnLineStart;
+
+    this.click = clickOnNode;
+    this.over = moverTemplate;
+    this.out = moutTemplate;
+    
+
+    this.on('mount', function(){
+
+    });

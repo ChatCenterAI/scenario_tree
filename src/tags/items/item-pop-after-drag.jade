@@ -7,10 +7,13 @@ item-pop-after-drag
   div.wrap-item.pop-list
     p(onclick='{addSimple}').px12.pt8.pb7 Message
     p(onclick='{showQuestionSelection}').px12.pt8.pb7 Question
-    p(onclick='{goTo}').px12.pt8.pb7 Go To
+    p(onclick='{showGoToSelection}').px12.pt8.pb7 Go To
   div.wrap-item.pop-question-list
     p(onclick='{addSelection}').px12.pt8.pb7 Selection
     p(onclick='{addOpenQuestion}').px12.pt8.pb7 Open Question
+  div.wrap-item.pop-goto-list
+    p(onclick='{goToInCurrentProject}').px12.pt8.pb7 In This Project
+    p(onclick='{goToAnotherProject}').px12.pt8.pb7 Another Project
 
   style(scoped, type='less').
     :scope {
@@ -41,6 +44,9 @@ item-pop-after-drag
         }
       }
       .pop-question-list {
+        display: none;
+      }
+      .pop-goto-list {
         display: none;
       }
     }
@@ -75,20 +81,6 @@ item-pop-after-drag
       }else if(targetEvent.nodeType=='group'){
         targetEvent.topLinePosition = {origin: from, to: to};
       }
-
-      /*
-      var event = getEventFromScenarioById(targetEvent.id);
-      if(event.type=='normal'){
-        event.gui.topLinePosition = {origin: from, to: to};
-      }else if(event.type=='selection'){
-        debugger
-      }
-      */
-
-      //debugger
-      //var preEvent = getEventFromScenarioByNext(targetEvent.id);
-      //preEvent.gui.topLinePosition = {origin: arrowOrigin, to: arrowTo};
-
 
       // contentを作成
       var content = {
@@ -197,7 +189,7 @@ item-pop-after-drag
     }
 
 
-    this.goTo = function(){
+    this.goToInCurrentProject = function(){
 
       // overlayを出してNodeを選択させる
       $('#canvasOverlay').fadeIn(400);
@@ -213,6 +205,14 @@ item-pop-after-drag
 
       // goToNodeを追加
       underChoiceOfGoTo = true;
+    }
+
+
+    this.goToAnotherProject = function(){
+      // シナリオリストを出す
+      $('util-modal').fadeIn(400);
+      riot.mount('modal-window-content', 'module-modal-select-project');
+      riot.update();
     }
 
 
@@ -234,6 +234,22 @@ item-pop-after-drag
     }
 
 
+    this.showGoToSelection = function(){
+      var pop = document.querySelector('wrap-pop-after-drag');
+      var preHeight = pop.offsetHeight;
+
+      $('.pop-list').hide();
+      $('.pop-goto-list').show();
+
+      var nowHeight = pop.offsetHeight;
+
+
+      var gap = (preHeight-nowHeight)/2;
+      
+      var y = parseInt(pop.style.top) + gap;
+
+      pop.style.top = `${y}px`;
+    }
 
     
 

@@ -22,6 +22,7 @@ var loadCanvas = function(firstEventId, letScrollToFirst){
       if(scenarioArray[i].type=='normal') addSimpleMessage(pos.x, pos.y, event, true);
       if(scenarioArray[i].type=='openquestion') addOpenQuestion(pos.x, pos.y, event, true);
       if(scenarioArray[i].type=='goto') addGoToNode(pos.x, pos.y, event, true);
+      if(scenarioArray[i].type=='gotoAnotherProject') addGoToAnotherProjectNode(pos.x, pos.y, event, true);
     }
     if(scenarioArray[i].nodeType == 'group') addSelections(pos.x, pos.y, event, true);
     
@@ -302,6 +303,68 @@ var addGoToNode = function(x, y, content, isLoading){
   }
 
 }
+
+
+
+var addGoToAnotherProjectNode = function(x, y, content, isLoading){
+
+  // 前のイベントと関連づけする
+  if(!(isLoading) && targetEvent && targetEvent.nodeType=='single'){
+    targetEvent.next = content.id;
+  }
+
+  if(!(isLoading) && targetEvent && targetEvent.nodeType=='group'){
+    
+    var selections = targetEvent.selections;
+    for(var i=0; i<selections.length; i++){
+      if(selections[i].id==targetSelectionEventId){
+        selections[i].next = content.id;
+      }
+    }
+    targetEvent.selections = selections;
+  }
+
+  // 最初の要素を入れ込む
+  var itemWrapper = document.createElement('div');
+  //itemWrapper.classList.add('wrap-item-message');
+  itemWrapper.dataset.id = content.id;
+  itemWrapper.id = content.id;
+
+  itemWrapper.addEventListener("mousedown", mdownOnNode, false);
+  itemWrapper.addEventListener("touchstart", mdownOnNode, false);
+
+  canvasNodes.appendChild(itemWrapper);
+
+  riot.mount(itemWrapper, 'item-goto-another-project-node', {content: content});
+  riot.update();
+
+
+  // 初期位置に配置
+  var item = {};
+  item.width = itemWrapper.offsetWidth;
+  item.height = itemWrapper.offsetHeight;
+  item.x = x;
+  item.y = y - item.height/2;
+
+  var style = itemWrapper.style;
+  style.position = 'absolute';
+
+  if(isLoading){
+    style.left = `${content.gui.position.x}px`;
+    style.top = `${content.gui.position.y}px`;
+  }else{
+    style.left = `${item.x}px`;
+    style.top = `${item.y}px`;
+    content.gui.position.x = item.x;
+    content.gui.position.y = item.y;
+  }
+
+  // イベントをシナリオに追加
+  if(!(isLoading)) scenarioArray.push(content);
+
+}
+
+
 
 var addLine = function(arrowOrigin, arrowTo, id){
   var topLine = document.createElementNS('http://www.w3.org/2000/svg','line');
@@ -797,16 +860,21 @@ var focusNode = function(focusedEvent){
       }
 
     break;
+    case 'gotoAnotherProject':
+
+      riot.mount('inspector', 'module-inspector-goto-project', {content: focusedEvent});
+      riot.update();
+
+    break
   }
 
   $('.focused-node').removeClass('focused-node');
   var node = document.getElementById(focusedEvent.id);
-  node.classList.add('focused-node');
+  if(node) node.classList.add('focused-node');
 
   if(focusedEvent.type=='goto'){
     var toNode = document.getElementById(toEvent.id);
-    console.log('toNode:', toNode);
-    toNode.classList.add('focused-node');
+    if(toNode) toNode.classList.add('focused-node');
   }
 
 }

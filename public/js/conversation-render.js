@@ -9,13 +9,21 @@ var initConversation = function(firstEventId){
   // selection-inputが開いていた場合は閉じる
   $('.wrap-selection-bubble').hide();
 
+  // G編集しているプロジェクトにシナリオを設定
+  var currentScenarioArray = scenarioArray;
+  currentScenarioArrayForConversation = currentScenarioArray;
+
+  // 自由文入力をリセット
+  var textarea = document.getElementById('conversationMessageInput');
+  textarea.placeholder = 'Message';
+
   fireEventOfConversation(firstEventId);
 
 }
 
 var fireEventOfConversation = function(eventId){
 
-  var event = getEventFromScenarioById(eventId);
+  var event = getEventFromCurrentScenarioByIdForConversation(eventId);
 
   if(!event) return;
 
@@ -76,11 +84,49 @@ var fireEventOfConversation = function(eventId){
     case 'goto':
 
       var nextId = event.toId;
-      fireEventOfConversation(nextId);      
+      fireEventOfConversation(nextId);
+
+      if(location.hash.indexOf('#project') >= 0) focusNode(event);
+    break;
+
+    case 'gotoAnotherProject':
+
+      (async () => {
+        var newScenario = await service.db.collection("projects")
+          .doc(event.scenarioId)
+          .collection("scenario")
+          .get()
+          .then(function(doc) {
+            var resultScenario = [];     
+            for(var i=0; i<doc.docs.length; i++){
+              //var data = doc.docs[i].data();
+              resultScenario.push(doc.docs[i].data());
+            }
+            return resultScenario;
+          });
+        
+        currentScenarioArrayForConversation = newScenario;
+
+        fireEventOfConversation(event.firstEventOfScenario);
+      })();
 
       if(location.hash.indexOf('#project') >= 0) focusNode(event);
     break;
   }
+
+}
+
+// eventIdからとってくる 
+var getEventFromCurrentScenarioByIdForConversation = function(id){
+
+  var event;
+  for(var i=0; i<currentScenarioArrayForConversation.length; i++){
+    if(currentScenarioArrayForConversation[i].id == id){
+      event = currentScenarioArrayForConversation[i];
+      break;
+    }
+  }
+  return event;
 
 }
 
