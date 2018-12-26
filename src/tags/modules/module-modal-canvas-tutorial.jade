@@ -1,0 +1,122 @@
+module-modal-canvas-tutorial
+  div.wrap-module.px14.py16
+    p.title.mb12 {title}
+    p.explanation.mb16 {explanation}
+    div.wrap-img.mb12.f.fc
+      img(src='{img}')
+    div.wrap-button.f.flex-right
+      p(onclick='{func}').px12.py8 {label}
+
+
+  style(scoped, type='less').
+    :scope {
+      display: block;
+      background: #FFF;
+      .wrap-module {
+        .title {
+          font-size: 18px;
+          font-weight: 500;
+          text-align: center;
+        }
+        .explanation {
+          font-size: 14px;
+          text-align: center;
+        }
+        .wrap-img {
+          min-width: 628px;
+          height: 300px;
+          img {
+            height: 100%;
+          }
+        }
+        .wrap-button {
+          p {
+            cursor: pointer;
+            color: #fff;
+            background: #2196F3;
+            border-radius: 3px;
+            text-align: center;
+            display: inline-block;
+            letter-spacing: 1px;
+          }
+        }
+      }
+    }
+
+  script.
+
+    var self = this;
+
+    this.on('mount', function(){
+      $('modal-window-content').addClass('show');
+
+      $(document).on("custom:closeModal", function() {
+        $('module-modal-create-project').removeClass('show');
+        self.unmount(true);
+        $('util-modal').fadeOut(400);
+      });
+    });
+
+    this.toFirst = function(){
+      this.title = 'Create a Next Message (1/5)';
+      this.explanation = 'Drag and drop this blue circle to create a new message.';
+      this.img = './img/tutorial/1.gif';
+      this.label = 'Next';
+      this.func = this.toSecond;
+    }
+
+    this.toSecond = function(){
+      this.title = 'Edit a Message (2/5)';
+      this.explanation = 'Click a node and you can edit message.';
+      this.img = './img/tutorial/2.png';
+      this.label = 'Next';
+      this.func = this.toThird;
+      this.update();
+    }
+
+    this.toThird = function(){
+      this.title = 'Preview your Bot (3/5)';
+      this.explanation = 'Click this preview button';
+      this.img = './img/tutorial/3.png';
+      this.label = 'Next';
+      this.func = this.toForth;
+      this.update();
+    }
+
+    this.toForth = function(){
+      this.title = 'Preview your Bot (4/5)';
+      this.explanation = 'and you can preview what story your bot talk.';
+      this.img = './img/tutorial/4.png';
+      this.label = 'Next';
+      this.func = this.toFifth;
+      this.update();
+    }
+
+    this.toFifth = function(){
+      this.title = 'Publish your Bot (5/5)';
+      this.explanation = 'Finally you can get a url to publish your bot from share button.';
+      this.img = './img/tutorial/5.png';
+      this.label = 'Finish';
+      this.func = this.toFinish;
+      this.update();
+    }
+
+    this.toFinish = async function(){
+      $(document).trigger('custom:closeModal');
+      await service.db.collection('users').doc(session.user.uid)
+        .update({isFirstUser: false});
+    }
+
+    /*this.toFifth = function(){
+      self.title = 'After editing, you can get a url to publish your bot from upper-right button.';
+      self.img = './img/tutorial/4.png';
+      self.label = 'Finish';
+      self.func = self.toForth;
+      self.update();
+    }*/
+
+    this.toFirst();
+
+    
+
+

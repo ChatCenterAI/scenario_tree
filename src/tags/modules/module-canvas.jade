@@ -125,6 +125,13 @@ module-canvas#canvas
       if(session.user){
         clearInterval(riot.loadScenarioTimer);
         self.loadScenario();
+
+        // 初めてのユーザーだった場合チュートリアルを表示
+        if(session.user.isFirstUser==undefined){
+          $('util-modal').fadeIn(400);
+          riot.mount('modal-window-content', 'module-modal-canvas-tutorial');
+          riot.update();
+        }
       }
     }, 800);
 

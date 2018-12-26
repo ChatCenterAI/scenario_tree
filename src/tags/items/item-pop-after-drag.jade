@@ -5,8 +5,8 @@ item-pop-after-drag
     p(onclick='{addOpenQuestion}').px12.pt8.pb7 Open Question
     p(onclick='{goTo}').px12.pt8.pb7 Go To
   div.wrap-item.pop-list
-    p(onclick='{addSimple}').px12.pt8.pb7 Simple Message
-    p(onclick='{showQuestionSelection}').px12.pt8.pb7 Ask a Question
+    p(onclick='{addSimple}').px12.pt8.pb7 Message
+    p(onclick='{showQuestionSelection}').px12.pt8.pb7 Question
     p(onclick='{goTo}').px12.pt8.pb7 Go To
   div.wrap-item.pop-question-list
     p(onclick='{addSelection}').px12.pt8.pb7 Selection
@@ -27,6 +27,7 @@ item-pop-after-drag
       }
       .wrap-item {
         p {
+          min-width: 140px;
           cursor: pointer;
           color: #fff;
           text-align: center;
