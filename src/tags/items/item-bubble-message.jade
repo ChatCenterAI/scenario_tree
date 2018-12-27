@@ -62,7 +62,7 @@ item-bubble-message
     this.content = opts.__proto__.content;
     this.isMine = opts.__proto__.isMine;
 
-    var photoUrl = riot.currentProject.userIcon; //session.user.photoUrl;
+    var photoUrl = currentProjectForConversation.userIcon;
     this.userIcon = `${photoUrl}?width=280&amp;height=280`;
     this.messageText = this.content.text;
 

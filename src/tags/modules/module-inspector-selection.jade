@@ -2,10 +2,10 @@ module-inspector-selection
   div.wrap-module.px8.pt16
     p.title.mb12 Selection
     div.wrap-ask.mb10
-      textarea(placeholder="What is your choice?" onkeyup='{save}')#messageInput.pt3.pb4.px4.mr6 {text}
+      textarea(placeholder="What is your choice?" onkeyup='{keyup}')#messageInput.pt3.pb4.px4.mr6 {text}
     div.mb4
       p.title-buttons.mb8 Buttons
-      textarea(each='{item in selections}' placeholder="Selection" onkeyup='{save}' onfocus="this.select();").textarea-selection.pt3.pb4.px4.mr6 {item.label}
+      textarea(each='{item in selections}' placeholder="Selection" onkeyup='{keyup}' onfocus="this.select();").textarea-selection.pt3.pb4.px4.mr6 {item.label}
     div(onclick='{addSelection}').wrap-add.mb12.f.fm
       img(src='./img/icon/add-blue.svg').add-icon.mr4
       p.add-text Add Button
@@ -132,6 +132,7 @@ module-inspector-selection
         }
       }
 
+      
       // 入力中はセーブさせない
       clearTimeout(self.saveTimer);
       self.saveTimer = setTimeout(self.save, 800);

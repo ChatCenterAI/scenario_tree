@@ -1,3 +1,5 @@
+var currentProjectForConversation;
+var underAnotherProject = false;
 
 var initConversation = function(firstEventId){
 
@@ -12,6 +14,7 @@ var initConversation = function(firstEventId){
   // G編集しているプロジェクトにシナリオを設定
   var currentScenarioArray = scenarioArray;
   currentScenarioArrayForConversation = currentScenarioArray;
+  currentProjectForConversation = riot.currentProject;
 
   // 自由文入力をリセット
   var textarea = document.getElementById('conversationMessageInput');
@@ -39,7 +42,7 @@ var fireEventOfConversation = function(eventId){
         var nextId = event.next;
         fireEventOfConversation(nextId);
 
-        if(location.hash.indexOf('#project') >= 0) focusNode(event);
+        if(location.hash.indexOf('#project') >= 0 && !(underAnotherProject)) focusNode(event);
       })();
 
     break;
@@ -57,7 +60,7 @@ var fireEventOfConversation = function(eventId){
         // selectionを出してmodule-conversationを調整
         $('.wrap-selection-bubble').slideToggle(400, resizeWrapMessages);
         
-        if(location.hash.indexOf('#project') >= 0) focusNode(event);
+        if(location.hash.indexOf('#project') >= 0 && !(underAnotherProject)) focusNode(event);
       })();
       
     break;
@@ -75,10 +78,10 @@ var fireEventOfConversation = function(eventId){
         var textarea = document.getElementById('conversationMessageInput');
         textarea.placeholder = event.expectedAnswer;
         
-        if(location.hash.indexOf('#project') >= 0) focusNode(event);
+        if(location.hash.indexOf('#project') >= 0 && !(underAnotherProject)) focusNode(event);
       })();
 
-      if(location.hash.indexOf('#project') >= 0) focusNode(event);
+      if(location.hash.indexOf('#project') >= 0 && !(underAnotherProject)) focusNode(event);
     break;
 
     case 'goto':
@@ -86,12 +89,16 @@ var fireEventOfConversation = function(eventId){
       var nextId = event.toId;
       fireEventOfConversation(nextId);
 
-      if(location.hash.indexOf('#project') >= 0) focusNode(event);
+      if(location.hash.indexOf('#project') >= 0 && !(underAnotherProject)) focusNode(event);
     break;
 
     case 'gotoAnotherProject':
 
       (async () => {
+        currentProjectForConversation = await service.db.collection("projects")
+          .doc(event.scenarioId).get();
+        currentProjectForConversation = currentProjectForConversation.data();
+
         var newScenario = await service.db.collection("projects")
           .doc(event.scenarioId)
           .collection("scenario")
@@ -107,6 +114,7 @@ var fireEventOfConversation = function(eventId){
         
         currentScenarioArrayForConversation = newScenario;
 
+        underAnotherProject = true;
         fireEventOfConversation(event.firstEventOfScenario);
       })();
 
@@ -116,7 +124,7 @@ var fireEventOfConversation = function(eventId){
 
 }
 
-// eventIdからとってくる 
+// eventIdからとってくる
 var getEventFromCurrentScenarioByIdForConversation = function(id){
 
   var event;
